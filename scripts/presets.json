@@ -1,6 +1,6 @@
 {
   "main": {
-    "outDir": "pdfs",
+    "outDir": "examples",
     "targets": [
       ["쿠팡",          "https://www.coupang.com"],
       ["마켓컬리",      "https://www.kurly.com"],
@@ -20,7 +20,7 @@
     ]
   },
   "small": {
-    "outDir": "pdfs",
+    "outDir": "examples",
     "targets": [
       ["29CM",          "https://www.29cm.co.kr"],
       ["카카오모빌리티", "https://www.kakaomobility.com"],
@@ -28,7 +28,7 @@
     ]
   },
   "niche": {
-    "outDir": "pdfs/2",
+    "outDir": "examples/niche",
     "targets": [
       ["뉴닉",       "https://newneek.co"],
       ["탬버린즈",   "https://www.tamburins.com"],
@@ -38,7 +38,7 @@
     ]
   },
   "smartstore": {
-    "outDir": "pdfs/naver",
+    "outDir": "examples/smartstore",
     "targets": [
       ["라일스코리아",   "https://smartstore.naver.com/lyleskorea"],
       ["데일리라이크",   "https://smartstore.naver.com/dailylike-official"],
@@ -48,13 +48,13 @@
     ]
   },
   "smartstore-single": {
-    "outDir": "pdfs",
+    "outDir": "examples",
     "targets": [
       ["12_스마트스토어_퍼퓸그라피", "https://smartstore.naver.com/perfumegraphy"]
     ]
   },
   "categories": {
-    "outDir": "pdfs",
+    "outDir": "examples",
     "targets": [
       ["01_대형이커머스_쿠팡",         "https://www.coupang.com"],
       ["02_핀테크_토스",                "https://toss.im"],

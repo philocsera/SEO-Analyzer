@@ -46,4 +46,5 @@ coverage/
 .claude/
 
 # ── 배치 결과물 보조 파일 (PDF 자체는 커밋하되 summary는 매 실행마다 갱신) ──
-pdfs/_summary.json
+examples/_summary.json
+examples/**/_summary.json

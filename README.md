@@ -313,7 +313,7 @@ node scripts/batch-pdf.mjs smartstore     # 5개 스마트스토어
 node scripts/batch-pdf.mjs niche          # 5개 소규모 서비스
 ```
 
-프리셋은 `scripts/presets.json`에 정의되어 있습니다. 결과 PDF는 `pdfs/` 디렉토리에 저장.
+프리셋은 `scripts/presets.json`에 정의되어 있습니다. 결과 PDF는 `examples/` 디렉토리에 저장 (이 레포의 `examples/` 안에 13개 카테고리 샘플이 미리 들어있습니다).
 
 ---
 

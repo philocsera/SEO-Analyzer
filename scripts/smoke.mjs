@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const PDFS_DIR = path.join(ROOT, 'pdfs')
-await fs.mkdir(PDFS_DIR, { recursive: true })
+const OUT_DIR = path.join(ROOT, 'examples')
+await fs.mkdir(OUT_DIR, { recursive: true })
 
 const BASE_URL = 'http://localhost:3000'
 const NAME = '토스'
@@ -72,7 +72,7 @@ const base64 = await page.evaluate(async (url) => {
 }, blobUrl)
 
 const pdfBuf = Buffer.from(base64, 'base64')
-const filePath = path.join(PDFS_DIR, `${NAME}.pdf`)
+const filePath = path.join(OUT_DIR, `${NAME}.pdf`)
 await fs.writeFile(filePath, pdfBuf)
 console.log(`saved ${filePath} (${(pdfBuf.length/1024).toFixed(0)}KB) in ${((Date.now()-start)/1000).toFixed(1)}s`)
 
