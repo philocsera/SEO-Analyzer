@@ -1,0 +1,74 @@
+{
+  "main": {
+    "outDir": "pdfs",
+    "targets": [
+      ["쿠팡",          "https://www.coupang.com"],
+      ["마켓컬리",      "https://www.kurly.com"],
+      ["무신사",        "https://www.musinsa.com"],
+      ["토스",          "https://toss.im"],
+      ["배달의민족",    "https://www.baemin.com"],
+      ["야놀자",        "https://www.yanolja.com"],
+      ["메가스터디",    "https://www.megastudy.net"],
+      ["클래스101",     "https://class101.net"],
+      ["굿닥",          "https://www.goodoc.co.kr"],
+      ["이니스프리",    "https://www.innisfree.com/kr/ko"],
+      ["멜론",          "https://www.melon.com"],
+      ["삼성전자",      "https://www.samsung.com/sec"],
+      ["채널톡",        "https://channel.io"],
+      ["오늘의집",      "https://ohou.se"],
+      ["Notion",        "https://www.notion.so"]
+    ]
+  },
+  "small": {
+    "outDir": "pdfs",
+    "targets": [
+      ["29CM",          "https://www.29cm.co.kr"],
+      ["카카오모빌리티", "https://www.kakaomobility.com"],
+      ["왓챠",          "https://watcha.com"]
+    ]
+  },
+  "niche": {
+    "outDir": "pdfs/2",
+    "targets": [
+      ["뉴닉",       "https://newneek.co"],
+      ["탬버린즈",   "https://www.tamburins.com"],
+      ["타입드",     "https://typed.do"],
+      ["닥터나우",   "https://www.docdocdoc.co.kr"],
+      ["콜로소",     "https://www.coloso.co.kr"]
+    ]
+  },
+  "smartstore": {
+    "outDir": "pdfs/naver",
+    "targets": [
+      ["라일스코리아",   "https://smartstore.naver.com/lyleskorea"],
+      ["데일리라이크",   "https://smartstore.naver.com/dailylike-official"],
+      ["티젠",           "https://smartstore.naver.com/teazenofficial"],
+      ["마브러스",       "https://smartstore.naver.com/marvrus"],
+      ["퍼퓸그라피",     "https://smartstore.naver.com/perfumegraphy"]
+    ]
+  },
+  "smartstore-single": {
+    "outDir": "pdfs",
+    "targets": [
+      ["12_스마트스토어_퍼퓸그라피", "https://smartstore.naver.com/perfumegraphy"]
+    ]
+  },
+  "categories": {
+    "outDir": "pdfs",
+    "targets": [
+      ["01_대형이커머스_쿠팡",         "https://www.coupang.com"],
+      ["02_핀테크_토스",                "https://toss.im"],
+      ["03_푸드테크_배달의민족",        "https://www.baemin.com"],
+      ["04_여행숙박_야놀자",            "https://www.yanolja.com"],
+      ["05_에듀테크_메가스터디",        "https://www.megastudy.net"],
+      ["06_헬스케어_굿닥",              "https://www.goodoc.co.kr"],
+      ["07_뷰티_이니스프리",            "https://www.innisfree.com/kr/ko"],
+      ["08_미디어_멜론",                "https://www.melon.com"],
+      ["09_대기업_삼성전자",            "https://www.samsung.com/sec"],
+      ["10_B2B_SaaS_채널톡",            "https://channel.io"],
+      ["11_스타트업_오늘의집",          "https://ohou.se"],
+      ["12_스마트스토어_라일스코리아",  "https://smartstore.naver.com/lyleskorea"],
+      ["13_글로벌_Notion",              "https://www.notion.so"]
+    ]
+  }
+}

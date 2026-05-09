@@ -1,0 +1,49 @@
+# ── 의존성 ──────────────────────────────────────────────────────
+node_modules/
+**/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# ── 환경 변수 / 비밀 ────────────────────────────────────────────
+# 모든 .env 변종을 차단 (.env, .env.local, .env.production 등 어디에 있든)
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# ── Next.js / Vercel 빌드 산출물 ────────────────────────────────
+.next/
+**/.next/
+out/
+build/
+.vercel/
+**/.vercel/
+
+# ── TypeScript ──────────────────────────────────────────────────
+*.tsbuildinfo
+next-env.d.ts
+**/next-env.d.ts
+
+# ── 로그 / 캐시 / OS ────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.DS_Store
+**/.DS_Store
+*.pem
+coverage/
+
+# ── Claude Code 작업공간 메타데이터 ─────────────────────────────
+.claude/
+
+# ── 배치 결과물 보조 파일 (PDF 자체는 커밋하되 summary는 매 실행마다 갱신) ──
+pdfs/_summary.json
