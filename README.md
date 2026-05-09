@@ -11,137 +11,6 @@ npm run dev
 
 ---
 
-## 보고서 항목 상세
-
-각 보고서는 다음 항목들로 구성되며, 모두 공식 출처에 근거합니다 (자의적 휴리스틱 배제).
-
-### 1. 종합 SEO 점수 (overallScore)
-
-**일반 사이트**: `기술 SEO 점수 × 0.7 + 브랜드 인지도 × 0.3`
-**스마트스토어**: `기술 SEO 점수` 단일값 (Naver 가이드 기반 5개 체크 평균)
-
-A/B/C/D 등급으로 표지에 배지 표시:
-- A 등급: 80점 이상
-- B 등급: 60–79점
-- C 등급: 40–59점
-- D 등급: 40점 미만
-
-### 2. 기술 SEO 체크리스트 (13개 항목)
-
-각 항목은 pass/warn/fail 3단계로 평가됩니다. 자의적 기준(예: "300단어 이상", "내부 링크 10개 이상" 등)은 의도적으로 제거되었으며, 모두 다음 출처에 근거합니다.
-
-#### Lighthouse v12 SEO category 정통 항목 (10개)
-
-| 항목 | Lighthouse audit ID | 검증 방식 |
-|------|---------------------|-----------|
-| 페이지 제목 | `document-title` | `<title>` 비어있지 않음 |
-| Meta Description | `meta-description` | `<meta name="description">` 비어있지 않음 |
-| Viewport 메타 | `viewport` | `<meta name="viewport">` 존재 + `user-scalable=no` 없음 (WCAG 1.4.4) |
-| Canonical | `canonical` | `<link rel="canonical">` 존재 |
-| 이미지 alt 속성 | `image-alt` | 모든 `<img>`에 alt 속성 (Lighthouse: 100%, 80%+ warn) |
-| 검색엔진 색인 허용 | `is-crawlable` | `<meta name="robots">`에 `noindex/none` 없음 |
-| robots.txt | `robots-txt` | 사이트 루트의 robots.txt 200 응답 |
-| 의미 있는 링크 텍스트 | `link-text` | "여기/click here/더보기" 등 일반어 비율 < 5% (Lighthouse 블랙리스트 + 한국어 표현 추가) |
-| 크롤 가능한 앵커 | `crawlable-anchors` | `<a>` 태그 중 `href` 누락·`javascript:` 비율 < 5% |
-| 플러그인 미사용 | `plugins` | `<embed>`, `<object>`, `<applet>` 검사 (Flash/Silverlight 차단) |
-
-#### Google Search Central 권장사항 (3개)
-
-| 항목 | 출처 | 검증 방식 |
-|------|------|-----------|
-| HTTPS 보안 | Google 명시 랭킹 시그널 (2014 발표) | URL이 `https://` |
-| sitemap.xml | Google Search Central — Sitemaps overview | 사이트 루트의 sitemap.xml 200 응답 |
-| 구조화 데이터 | Google Search Central — Structured data | JSON-LD `<script type="application/ld+json">` 존재 |
-
-#### 현재 cheerio 크롤링으로 검증 불가한 항목
-
-다음 Lighthouse audit은 헤드리스 브라우저(렌더링)가 필요해 현재 미구현:
-- `font-size` (legible 폰트)
-- `tap-targets` (탭 영역 크기)
-
-Puppeteer/Playwright 통합 시 추후 추가 예정.
-
-### 3. 기술 개선 필요 항목
-
-위 13개 체크 중 fail/warn 항목을 묶어 각각의 **개선 제안** + **샘플 코드 스니펫**을 제공합니다. 예: `og:title` 누락 시 → `<meta property="og:title" content="...">` 코드 예시 자동 생성.
-
-### 4. AI 브랜드 분석 (Claude)
-
-크롤링된 페이지 데이터(제목·H 태그·본문 발췌 2500자·실패 SEO 항목)를 Claude `claude-sonnet-4-6`에 전달해 다음을 추출:
-
-- **추정 업종** — 페이지 콘텐츠 기반 업종 분류
-- **기업 규모** — DART 매칭이 있으면 강제 사용, 없으면 AI 추정
-- **핵심 타깃 고객** — 2~3문장
-- **브랜드 스토리** — 3~4문장
-- **차별화 포인트** — 3개 항목
-- **마케팅 전략 제안** — 5~7문장
-- **우선순위별 개선 항목** — 5개 (critical 2개 + warning 2개 + info 1개), 각각 카테고리·제목·실행 방법 포함
-- **추천 SEO 키워드** — 5개 (이후 Naver 검색광고 API로 검색량/경쟁도 추가)
-
-JSON 응답은 `lib/json-repair.ts`의 3단계 폴백(`JSON.parse` → `sanitizeJson` → `repairTruncatedJson`)으로 안정화.
-
-### 5. 브랜드 인지도 점수 (일반 사이트만, 0–100점)
-
-페이지에서 다음 신호를 검출해 가중합:
-
-| 신호 | 배점 | 검출 방법 |
-|------|------|-----------|
-| SNS 채널 | 플랫폼당 10점 (최대 30) | Instagram, YouTube, Twitter/X, 네이버 블로그·포스트 링크 검출 |
-| About 페이지 | 30점 | `/about`, `/company`, `/introduce` URL 또는 "회사소개" 등 텍스트 |
-| 로고 | 20점 | `<img>` src/alt/class에 "logo" 키워드 또는 OG 이미지 존재 |
-| 연락처 정보 | 20점 | 페이지 내 한국 전화번호·이메일·시·도명 정규식 매칭 |
-
-추가로 AI가 메시지 일관성·타깃 명확성·차별화 강도를 "높음/보통/낮음"으로 라벨링.
-
-### 6. Core Web Vitals (CrUX, Google)
-
-Chrome User Experience Report API에서 실제 사용자 측정값(p75)을 가져옵니다:
-
-- **LCP** (Largest Contentful Paint) — 주 콘텐츠 로딩 시간
-- **FCP** (First Contentful Paint) — 첫 콘텐츠 표시 시간
-- **INP** (Interaction to Next Paint) — 인터랙션 응답성
-- **CLS** (Cumulative Layout Shift) — 레이아웃 안정성
-- **TTFB** (Time to First Byte) — 서버 응답 속도
-
-각 메트릭은 Google 기준 good/needsImprovement/poor 분포(%)로 표시. 트래픽이 적은 사이트는 데이터 없음(N/A) 처리.
-
-### 7. 매출 추정 (DART 공시 기반, 일반 사이트만)
-
-페이지에서 회사명을 추출해 DART(금융감독원 전자공시) API에서 매칭:
-1. organizationName (Schema.org Organization) 우선
-2. og:site_name → 페이지 title의 일부 → 본문 copyright 패턴
-
-매칭 성공 시:
-- 직원 수, 매출액, 업종 코드 조회
-- 중소기업기본법 기준으로 **소규모/중소기업/중견기업/대기업** 분류
-- 업종별 임계치 (제조업: 300명/400억, 서비스업: 100명/200억 등)
-
-매칭 실패 시 AI가 페이지 콘텐츠로 추정.
-
-### 8. 추천 SEO 키워드 (검색량 + 경쟁도)
-
-AI가 추천한 5개 키워드를 Naver 검색광고 API에 조회:
-- **검색량**: 매우 높음 / 높음 / 보통 / 낮음 / 매우 낮음
-- **경쟁도**: 높음 / 보통 / 낮음 / 매우 낮음
-
-API 미설정 시 폴백 라벨 사용. PDF에는 표 형태로 표시.
-
-### 9. 스마트스토어 전용 분석 (URL이 `smartstore.naver.com/*` 또는 `brand.naver.com/*`인 경우)
-
-Naver 쇼핑검색 API로 상품 100개를 가져와 **Naver 공식 가이드 기반 5개 항목**으로 평가:
-
-| 항목 | 출처 | 임계 |
-|------|------|------|
-| 카테고리 분류 등록 | Naver 쇼핑검색 SEO 가이드 — "카테고리 누락 상품은 노출 제외" | 100% |
-| 가격 정보 등록 | Naver 가이드 — "가격 미등록 시 가격 비교 노출 제외" | 95%+ |
-| 브랜드 정보 등록 | Naver 가이드 — "브랜드 필터 노출 조건" | 60%+ |
-| 카테고리 전문성 (집중도) | Naver C-rank 알고리즘 — "특정 카테고리 전문 스토어 우대" | 60%+ |
-| 키워드 나열 미사용 | Naver 가이드 — "키워드 나열 금지(노출 페널티)" | 의심 상품 < 10% |
-
-추가로 AI가 상품명·키워드·카테고리·브랜드 데이터로 마케팅 전략과 개선 제안 생성. 리뷰·평점·노출순위는 공식 API에서 제공하지 않아 분석 제외(보고서에 명시).
-
----
-
 ## 환경 변수 (`seo-app/.env.local`)
 
 다음 키들을 `seo-app/.env.local`에 작성하세요. **`ANTHROPIC_API_KEY` 외에는 모두 선택**(미설정 시 해당 기능만 비활성화 또는 폴백 동작).
@@ -271,7 +140,7 @@ NAVER_AD_SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx==
 ### 비용 절감 팁
 
 - **결과 캐싱**: 같은 URL 24시간 내 재분석 시 클라이언트 `localStorage`에서 결과 재사용 (현재 `lib/result-cache.ts`에 구현되어 있음, 서버 호출 발생 안 함).
-- **422 백오프**: Anthropic SDK `maxRetries: 4` 설정으로 rate limit 시 자동 재시도. 429는 모델 실행 전 거부되므로 비용 0.
+- **429 백오프**: Anthropic SDK `maxRetries: 4` 설정으로 rate limit 시 자동 재시도. 429는 모델 실행 전 거부되므로 비용 0.
 - **JSON 파싱 폴백**: `lib/json-repair.ts`의 3단계 복구로 파싱 실패 시 재요청 비용을 회피.
 
 ---
@@ -314,6 +183,137 @@ node scripts/batch-pdf.mjs niche          # 5개 소규모 서비스
 ```
 
 프리셋은 `scripts/presets.json`에 정의되어 있습니다. 결과 PDF는 `examples/` 디렉토리에 저장 (이 레포의 `examples/` 안에 13개 카테고리 샘플이 미리 들어있습니다).
+
+---
+
+## 보고서 항목 상세
+
+각 보고서는 다음 항목들로 구성되며, 모두 공식 출처에 근거합니다 (자의적 휴리스틱 배제).
+
+### 1. 종합 SEO 점수 (overallScore)
+
+**일반 사이트**: `기술 SEO 점수 × 0.7 + 브랜드 인지도 × 0.3`
+**스마트스토어**: `기술 SEO 점수` 단일값 (Naver 가이드 기반 5개 체크 평균)
+
+A/B/C/D 등급으로 표지에 배지 표시:
+- A 등급: 80점 이상
+- B 등급: 60–79점
+- C 등급: 40–59점
+- D 등급: 40점 미만
+
+### 2. 기술 SEO 체크리스트 (13개 항목)
+
+각 항목은 pass/warn/fail 3단계로 평가됩니다. 자의적 기준(예: "300단어 이상", "내부 링크 10개 이상" 등)은 의도적으로 제거되었으며, 모두 다음 출처에 근거합니다.
+
+#### Lighthouse v12 SEO category 정통 항목 (10개)
+
+| 항목 | Lighthouse audit ID | 검증 방식 |
+|------|---------------------|-----------|
+| 페이지 제목 | `document-title` | `<title>` 비어있지 않음 |
+| Meta Description | `meta-description` | `<meta name="description">` 비어있지 않음 |
+| Viewport 메타 | `viewport` | `<meta name="viewport">` 존재 + `user-scalable=no` 없음 (WCAG 1.4.4) |
+| Canonical | `canonical` | `<link rel="canonical">` 존재 |
+| 이미지 alt 속성 | `image-alt` | 모든 `<img>`에 alt 속성 (Lighthouse: 100%, 80%+ warn) |
+| 검색엔진 색인 허용 | `is-crawlable` | `<meta name="robots">`에 `noindex/none` 없음 |
+| robots.txt | `robots-txt` | 사이트 루트의 robots.txt 200 응답 |
+| 의미 있는 링크 텍스트 | `link-text` | "여기/click here/더보기" 등 일반어 비율 < 5% (Lighthouse 블랙리스트 + 한국어 표현 추가) |
+| 크롤 가능한 앵커 | `crawlable-anchors` | `<a>` 태그 중 `href` 누락·`javascript:` 비율 < 5% |
+| 플러그인 미사용 | `plugins` | `<embed>`, `<object>`, `<applet>` 검사 (Flash/Silverlight 차단) |
+
+#### Google Search Central 권장사항 (3개)
+
+| 항목 | 출처 | 검증 방식 |
+|------|------|-----------|
+| HTTPS 보안 | Google 명시 랭킹 시그널 (2014 발표) | URL이 `https://` |
+| sitemap.xml | Google Search Central — Sitemaps overview | 사이트 루트의 sitemap.xml 200 응답 |
+| 구조화 데이터 | Google Search Central — Structured data | JSON-LD `<script type="application/ld+json">` 존재 |
+
+#### 현재 cheerio 크롤링으로 검증 불가한 항목
+
+다음 Lighthouse audit은 헤드리스 브라우저(렌더링)가 필요해 현재 미구현:
+- `font-size` (legible 폰트)
+- `tap-targets` (탭 영역 크기)
+
+Puppeteer/Playwright 통합 시 추후 추가 예정.
+
+### 3. 기술 개선 필요 항목
+
+위 13개 체크 중 fail/warn 항목을 묶어 각각의 **개선 제안** + **샘플 코드 스니펫**을 제공합니다. 예: `og:title` 누락 시 → `<meta property="og:title" content="...">` 코드 예시 자동 생성.
+
+### 4. AI 브랜드 분석 (Claude)
+
+크롤링된 페이지 데이터(제목·H 태그·본문 발췌 2500자·실패 SEO 항목)를 Claude `claude-sonnet-4-6`에 전달해 다음을 추출:
+
+- **추정 업종** — 페이지 콘텐츠 기반 업종 분류
+- **기업 규모** — DART 매칭이 있으면 강제 사용, 없으면 AI 추정
+- **핵심 타깃 고객** — 2~3문장
+- **브랜드 스토리** — 3~4문장
+- **차별화 포인트** — 3개 항목
+- **마케팅 전략 제안** — 5~7문장
+- **우선순위별 개선 항목** — 5개 (critical 2개 + warning 2개 + info 1개), 각각 카테고리·제목·실행 방법 포함
+- **추천 SEO 키워드** — 5개 (이후 Naver 검색광고 API로 검색량/경쟁도 추가)
+
+JSON 응답은 `lib/json-repair.ts`의 3단계 폴백(`JSON.parse` → `sanitizeJson` → `repairTruncatedJson`)으로 안정화.
+
+### 5. 브랜드 인지도 점수 (일반 사이트만, 0–100점)
+
+페이지에서 다음 신호를 검출해 가중합:
+
+| 신호 | 배점 | 검출 방법 |
+|------|------|-----------|
+| SNS 채널 | 플랫폼당 10점 (최대 30) | Instagram, YouTube, Twitter/X, 네이버 블로그·포스트 링크 검출 |
+| About 페이지 | 30점 | `/about`, `/company`, `/introduce` URL 또는 "회사소개" 등 텍스트 |
+| 로고 | 20점 | `<img>` src/alt/class에 "logo" 키워드 또는 OG 이미지 존재 |
+| 연락처 정보 | 20점 | 페이지 내 한국 전화번호·이메일·시·도명 정규식 매칭 |
+
+추가로 AI가 메시지 일관성·타깃 명확성·차별화 강도를 "높음/보통/낮음"으로 라벨링.
+
+### 6. Core Web Vitals (CrUX, Google)
+
+Chrome User Experience Report API에서 실제 사용자 측정값(p75)을 가져옵니다:
+
+- **LCP** (Largest Contentful Paint) — 주 콘텐츠 로딩 시간
+- **FCP** (First Contentful Paint) — 첫 콘텐츠 표시 시간
+- **INP** (Interaction to Next Paint) — 인터랙션 응답성
+- **CLS** (Cumulative Layout Shift) — 레이아웃 안정성
+- **TTFB** (Time to First Byte) — 서버 응답 속도
+
+각 메트릭은 Google 기준 good/needsImprovement/poor 분포(%)로 표시. 트래픽이 적은 사이트는 데이터 없음(N/A) 처리.
+
+### 7. 매출 추정 (DART 공시 기반, 일반 사이트만)
+
+페이지에서 회사명을 추출해 DART(금융감독원 전자공시) API에서 매칭:
+1. organizationName (Schema.org Organization) 우선
+2. og:site_name → 페이지 title의 일부 → 본문 copyright 패턴
+
+매칭 성공 시:
+- 직원 수, 매출액, 업종 코드 조회
+- 중소기업기본법 기준으로 **소규모/중소기업/중견기업/대기업** 분류
+- 업종별 임계치 (제조업: 300명/400억, 서비스업: 100명/200억 등)
+
+매칭 실패 시 AI가 페이지 콘텐츠로 추정.
+
+### 8. 추천 SEO 키워드 (검색량 + 경쟁도)
+
+AI가 추천한 5개 키워드를 Naver 검색광고 API에 조회:
+- **검색량**: 매우 높음 / 높음 / 보통 / 낮음 / 매우 낮음
+- **경쟁도**: 높음 / 보통 / 낮음 / 매우 낮음
+
+API 미설정 시 폴백 라벨 사용. PDF에는 표 형태로 표시.
+
+### 9. 스마트스토어 전용 분석 (URL이 `smartstore.naver.com/*` 또는 `brand.naver.com/*`인 경우)
+
+Naver 쇼핑검색 API로 상품 100개를 가져와 **Naver 공식 가이드 기반 5개 항목**으로 평가:
+
+| 항목 | 출처 | 임계 |
+|------|------|------|
+| 카테고리 분류 등록 | Naver 쇼핑검색 SEO 가이드 — "카테고리 누락 상품은 노출 제외" | 100% |
+| 가격 정보 등록 | Naver 가이드 — "가격 미등록 시 가격 비교 노출 제외" | 95%+ |
+| 브랜드 정보 등록 | Naver 가이드 — "브랜드 필터 노출 조건" | 60%+ |
+| 카테고리 전문성 (집중도) | Naver C-rank 알고리즘 — "특정 카테고리 전문 스토어 우대" | 60%+ |
+| 키워드 나열 미사용 | Naver 가이드 — "키워드 나열 금지(노출 페널티)" | 의심 상품 < 10% |
+
+추가로 AI가 상품명·키워드·카테고리·브랜드 데이터로 마케팅 전략과 개선 제안 생성. 리뷰·평점·노출순위는 공식 API에서 제공하지 않아 분석 제외(보고서에 명시).
 
 ---
 
