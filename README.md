@@ -228,17 +228,9 @@ A/B/C/D 등급으로 표지에 배지 표시:
 | sitemap.xml | Google Search Central — Sitemaps overview | 사이트 루트의 sitemap.xml 200 응답 |
 | 구조화 데이터 | Google Search Central — Structured data | JSON-LD `<script type="application/ld+json">` 존재 |
 
-#### 현재 cheerio 크롤링으로 검증 불가한 항목
-
-다음 Lighthouse audit은 헤드리스 브라우저(렌더링)가 필요해 현재 미구현:
-- `font-size` (legible 폰트)
-- `tap-targets` (탭 영역 크기)
-
-Puppeteer/Playwright 통합 시 추후 추가 예정.
-
 ### 3. 기술 개선 필요 항목
 
-위 13개 체크 중 fail/warn 항목을 묶어 각각의 **개선 제안** + **샘플 코드 스니펫**을 제공합니다. 예: `og:title` 누락 시 → `<meta property="og:title" content="...">` 코드 예시 자동 생성.
+위 13개 체크 중 fail/warn 항목을 묶어 각각의 **개선 제안** + **샘플 코드**를 제공합니다. 예: `og:title` 누락 시 → `<meta property="og:title" content="...">` 코드 예시 자동 생성.
 
 ### 4. AI 브랜드 분석 (Claude)
 
@@ -252,8 +244,6 @@ Puppeteer/Playwright 통합 시 추후 추가 예정.
 - **마케팅 전략 제안** — 5~7문장
 - **우선순위별 개선 항목** — 5개 (critical 2개 + warning 2개 + info 1개), 각각 카테고리·제목·실행 방법 포함
 - **추천 SEO 키워드** — 5개 (이후 Naver 검색광고 API로 검색량/경쟁도 추가)
-
-JSON 응답은 `lib/json-repair.ts`의 3단계 폴백(`JSON.parse` → `sanitizeJson` → `repairTruncatedJson`)으로 안정화.
 
 ### 5. 브랜드 인지도 점수 (일반 사이트만, 0–100점)
 
