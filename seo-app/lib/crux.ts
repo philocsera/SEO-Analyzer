@@ -59,8 +59,19 @@ export async function fetchCruxData(url: string): Promise<CruxData | null> {
 
     const data: CruxApiResponse = await res.json()
 
-    // 데이터 없는 사이트 (404) → null 반환
-    if (!res.ok || data.error || !data.record?.metrics) return null
+    // 404 = 해당 origin의 트래픽이 적어 CrUX 표본이 없음(정상, 조용히 미표시).
+    // 그 외(403=API 비활성/키 권한, 400=잘못된 요청, 429 등)는 설정 문제이므로 로깅해
+    // 운영자가 "왜 항상 데이터가 안 나오는지" 진단할 수 있게 한다.
+    if (!res.ok || data.error) {
+      if (res.status !== 404) {
+        console.warn(
+          `[CrUX] 호출 실패 (status=${res.status}): ${data.error?.message ?? '알 수 없는 오류'} — ` +
+          `Chrome UX Report API 활성화 및 GOOGLE_PAGESPEED_API_KEY 권한을 확인하세요. (origin=${origin})`,
+        )
+      }
+      return null
+    }
+    if (!data.record?.metrics) return null
 
     const m = data.record.metrics
     const period = data.record.collectionPeriod

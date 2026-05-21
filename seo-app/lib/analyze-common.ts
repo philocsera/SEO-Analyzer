@@ -36,7 +36,7 @@ export async function guardAnalyzeRequest(req: NextRequest): Promise<GuardOk | G
     }
   }
 
-  const limit = checkRateLimit(req)
+  const limit = await checkRateLimit(req)
   if (!limit.allowed) {
     return {
       ok: false,

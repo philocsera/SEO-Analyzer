@@ -34,8 +34,11 @@ export async function fetchHtml(url: string, retries = 3): Promise<string> {
       let charset = res.headers.get('content-type')?.match(/charset=([^\s;]+)/i)?.[1]
 
       // 헤더에 없으면 HTML 앞부분(latin1로 읽어 ASCII 안전)에서 meta charset 탐지
+      // 2048바이트보다 작은 페이지(예: example.com)는 byteLength로 클램프 — 그렇지 않으면
+      // new Uint8Array(buf, 0, 2048)이 RangeError("Invalid typed array length")로 분석을 죽인다.
       if (!charset) {
-        const head = new TextDecoder('latin1').decode(new Uint8Array(buf, 0, 2048))
+        const headLen = Math.min(2048, buf.byteLength)
+        const head = new TextDecoder('latin1').decode(new Uint8Array(buf, 0, headLen))
         charset =
           head.match(/<meta[^>]+charset=["']?\s*([^\s"';>]+)/i)?.[1] ??
           head.match(/<meta[^>]+content=["'][^"']*charset=([^\s"';>]+)/i)?.[1]
