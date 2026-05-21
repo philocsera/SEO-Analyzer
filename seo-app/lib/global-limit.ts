@@ -13,20 +13,24 @@ export interface GlobalLimitResult {
 }
 
 // 호출 시 당일 카운터를 1 증가시키고 상한 초과 여부를 반환한다(원자적 INCR).
+// scope로 분석 종류별(SEO/GEO) 카운터를 분리한다 — 비용 구조가 다르므로.
 // Redis가 없으면(로컬·미설정) 항상 허용. Redis 장애 시에도 분석을 막지 않는다.
-export async function consumeGlobalDailyQuota(): Promise<GlobalLimitResult> {
-  if (!redis) return { allowed: true, count: 0, cap: DAILY_CAP }
+export async function consumeGlobalDailyQuota(
+  scope: string = 'analyze',
+  cap: number = DAILY_CAP,
+): Promise<GlobalLimitResult> {
+  if (!redis) return { allowed: true, count: 0, cap }
 
   const day = new Date().toISOString().slice(0, 10) // YYYY-MM-DD (UTC)
-  const key = `seo:global:analyze:${day}`
+  const key = `seo:global:${scope}:${day}`
   try {
     const count = await redis.incr(key)
     if (count === 1) {
       // 첫 증가 시에만 만료 설정(26h: 자정 경계 + 약간의 여유).
       await redis.expire(key, 60 * 60 * 26)
     }
-    return { allowed: count <= DAILY_CAP, count, cap: DAILY_CAP }
+    return { allowed: count <= cap, count, cap }
   } catch {
-    return { allowed: true, count: 0, cap: DAILY_CAP }
+    return { allowed: true, count: 0, cap }
   }
 }

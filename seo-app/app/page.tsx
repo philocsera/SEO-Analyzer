@@ -146,11 +146,19 @@ export default function Home() {
     <main className="min-h-screen bg-[#0a0f1e] text-slate-100">
       {/* 헤더 */}
       <header className="border-b border-slate-800/50 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
-            <Search className="w-4 h-4 text-white" />
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <Search className="w-4 h-4 text-white" />
+            </div>
+            <span className="font-bold text-lg text-white">SEO Analyzer</span>
           </div>
-          <span className="font-bold text-lg text-white">SEO Analyzer</span>
+          <a
+            href="/geo"
+            className="text-sm text-slate-400 hover:text-slate-100 transition-colors"
+          >
+            GEO 분석 →
+          </a>
         </div>
       </header>
 
