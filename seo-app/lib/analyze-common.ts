@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getKeywordStats } from './naver-ad'
 import { checkRateLimit } from './rate-limiter'
+import { assertSafeUrl, SsrfError } from './safe-fetch'
 
 const FALLBACK_VOLUME      = ['매우 높음', '높음', '보통', '낮음', '매우 낮음']
 const FALLBACK_COMPETITION = ['높음', '보통', '낮음', '낮음', '매우 낮음']
@@ -17,8 +18,6 @@ export async function buildKeywords(recommendations: string[]) {
     }
   })
 }
-
-const PRIVATE_HOST_RE = /^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.|0\.0\.0\.0|::1|fe80:|fc00:|fd[0-9a-f]{2}:)/i
 
 export type GuardOk = { ok: true; url: string }
 export type GuardFail = { ok: false; response: NextResponse }
@@ -47,8 +46,9 @@ export async function guardAnalyzeRequest(req: NextRequest): Promise<GuardOk | G
     }
   }
 
-  const { url } = await req.json()
-  if (!url) {
+  const body = await req.json().catch(() => null)
+  const url = body?.url
+  if (!url || typeof url !== 'string') {
     return { ok: false, response: NextResponse.json({ error: 'URL이 필요합니다.' }, { status: 400 }) }
   }
 
@@ -57,20 +57,12 @@ export async function guardAnalyzeRequest(req: NextRequest): Promise<GuardOk | G
     normalizedUrl = 'https://' + normalizedUrl
   }
 
-  let parsed: URL
+  // 프로토콜 + 내부망 + DNS 리바인딩 검증 (SSRF 방어)
   try {
-    parsed = new URL(normalizedUrl)
-  } catch {
-    return { ok: false, response: NextResponse.json({ error: '유효하지 않은 URL입니다.' }, { status: 400 }) }
-  }
-
-  if (!['http:', 'https:'].includes(parsed.protocol)) {
-    return { ok: false, response: NextResponse.json({ error: 'http/https URL만 분석할 수 있습니다.' }, { status: 400 }) }
-  }
-
-  const host = parsed.hostname.toLowerCase()
-  if (PRIVATE_HOST_RE.test(host) || host === '::') {
-    return { ok: false, response: NextResponse.json({ error: '내부망·메타데이터 호스트는 분석할 수 없습니다.' }, { status: 400 }) }
+    await assertSafeUrl(normalizedUrl)
+  } catch (e) {
+    const message = e instanceof SsrfError ? e.message : '유효하지 않은 URL입니다.'
+    return { ok: false, response: NextResponse.json({ error: message }, { status: 400 }) }
   }
 
   return { ok: true, url: normalizedUrl }

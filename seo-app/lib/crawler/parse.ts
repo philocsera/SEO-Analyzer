@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio'
 import { fetchHtml } from './fetch-html'
+import { safeFetch } from '../safe-fetch'
 
 export interface CrawlData {
   title: string
@@ -107,8 +108,8 @@ export async function crawlUrl(url: string): Promise<CrawlData> {
   const wordCount = bodyText.split(/\s+/).filter(Boolean).length
 
   const [robotsRes, sitemapRes] = await Promise.allSettled([
-    fetch(`${origin}/robots.txt`),
-    fetch(`${origin}/sitemap.xml`),
+    safeFetch(`${origin}/robots.txt`),
+    safeFetch(`${origin}/sitemap.xml`),
   ])
 
   const hasRobotsTxt =

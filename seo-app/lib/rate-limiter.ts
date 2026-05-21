@@ -1,9 +1,10 @@
 // 분석 엔드포인트(/api/analyze)는 1회당 Anthropic 비용(~$0.06)이 발생하므로
 // 비용 어뷰징을 막아야 한다. Vercel 서버리스에서는 in-memory Map이 인스턴스마다·
 // 콜드스타트마다 리셋되어 사실상 제한이 안 걸리므로, Upstash Redis로 인스턴스 간
-// 공유 카운터를 둔다. Upstash 환경변수가 없으면(로컬·미설정 배포) in-memory로 폴백.
+// 공유 카운터를 둔다. Redis가 없으면(로컬·미설정 배포) in-memory로 폴백.
 import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { ipAddress } from '@vercel/functions'
+import { redis } from './redis'
 
 const MINUTE_LIMIT = 3
 const HOUR_LIMIT   = 10
@@ -15,10 +16,21 @@ export interface RateLimitResult {
   retryAfter?: number // 초 단위
 }
 
+// 레이트리밋 키로 쓸 클라이언트 IP. x-forwarded-for의 맨 앞 값은 클라이언트가
+// 임의로 위조할 수 있어(매 요청 다른 IP → 제한 우회) 신뢰하지 않는다. Vercel이
+// 셋팅하는 신뢰값을 @vercel/functions의 ipAddress()로 얻고, 없으면 x-real-ip로 폴백.
 function extractIp(req: Request): string {
-  const forwarded = req.headers.get('x-forwarded-for')
-  if (forwarded) return forwarded.split(',')[0].trim()
-  return req.headers.get('x-real-ip')?.trim() || 'unknown'
+  const vercelIp = ipAddress(req)
+  if (vercelIp) return vercelIp
+  const realIp = req.headers.get('x-real-ip')?.trim()
+  if (realIp) return realIp
+  // 비-Vercel 환경 폴백: XFF의 마지막 값(가장 가까운 신뢰 프록시가 덧붙인 값).
+  const xff = req.headers.get('x-forwarded-for')
+  if (xff) {
+    const parts = xff.split(',').map((s) => s.trim()).filter(Boolean)
+    if (parts.length) return parts[parts.length - 1]
+  }
+  return 'unknown'
 }
 
 function isLocalhost(req: Request): boolean {
@@ -27,40 +39,20 @@ function isLocalhost(req: Request): boolean {
 }
 
 // ── Upstash Redis (durable, 서버리스 인스턴스 간 공유) ──────────────
-// Vercel 마켓플레이스 Upstash 연결은 통합 종류에 따라 변수명이 다르다:
-//  - 네이티브 Upstash 통합 → UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
-//  - KV 스타일 통합(upstash-kv) → KV_REST_API_URL / KV_REST_API_TOKEN
-// 둘 다 지원하도록 폴백한다. (그래서 Redis.fromEnv() 대신 명시적 생성)
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL
-const redisToken =
-  process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN
-
-const hasUpstash = !!redisUrl && !!redisToken
-
-const redisLimiters = hasUpstash
-  ? (() => {
-      const redis = new Redis({ url: redisUrl!, token: redisToken! })
-      return {
-        minute: new Ratelimit({
-          redis,
-          limiter: Ratelimit.slidingWindow(MINUTE_LIMIT, '1 m'),
-          prefix: 'seo:rl:min',
-        }),
-        hour: new Ratelimit({
-          redis,
-          limiter: Ratelimit.slidingWindow(HOUR_LIMIT, '1 h'),
-          prefix: 'seo:rl:hr',
-        }),
-      }
-    })()
+const redisLimiters = redis
+  ? {
+      minute: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(MINUTE_LIMIT, '1 m'),
+        prefix: 'seo:rl:min',
+      }),
+      hour: new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(HOUR_LIMIT, '1 h'),
+        prefix: 'seo:rl:hr',
+      }),
+    }
   : null
-
-if (!redisLimiters && process.env.NODE_ENV === 'production') {
-  console.warn(
-    '[rate-limiter] Upstash 변수(UPSTASH_REDIS_REST_URL/TOKEN 또는 KV_REST_API_URL/TOKEN) 미설정 — in-memory 폴백 사용 중. ' +
-    '서버리스에서는 인스턴스마다 카운터가 리셋되어 비용 어뷰징 방어가 약합니다.',
-  )
-}
 
 async function checkRedis(ip: string): Promise<RateLimitResult> {
   // 분당 제한 → 시간당 제한 순으로 검사. 허용된 요청만 두 카운터를 모두 소비한다.
@@ -97,7 +89,9 @@ function checkInMemory(ip: string): RateLimitResult {
 }
 
 export async function checkRateLimit(req: Request): Promise<RateLimitResult> {
-  if (isLocalhost(req)) return { allowed: true }
+  // localhost 우회는 개발 편의용이다. 프로덕션에서는 Host 헤더가 위조 가능하므로
+  // (예: Host: localhost) 비프로덕션 환경에서만 우회를 허용한다.
+  if (process.env.NODE_ENV !== 'production' && isLocalhost(req)) return { allowed: true }
 
   const ip = extractIp(req)
 

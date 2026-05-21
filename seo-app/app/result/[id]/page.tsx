@@ -58,8 +58,22 @@ function ResultContent() {
           setMounted(true)
           return
         }
-        // 2순위: localStorage (이전에 분석한 결과)
+
         const url = decodeURIComponent(params.id as string)
+
+        // 2순위: 서버 캐시 (공유 링크·다른 기기에서 재방문)
+        try {
+          const res = await fetch(`/api/result?url=${encodeURIComponent(url)}`)
+          if (res.ok) {
+            setResult(await res.json())
+            setMounted(true)
+            return
+          }
+        } catch {
+          // 서버 조회 실패 시 로컬 폴백
+        }
+
+        // 3순위: localStorage (같은 브라우저 이전 분석)
         const { loadResult } = await import('@/lib/result-cache')
         const cached = loadResult(url)
         if (cached) setResult(cached)

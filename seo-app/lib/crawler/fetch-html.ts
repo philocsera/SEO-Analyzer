@@ -1,5 +1,8 @@
 // HTML fetch + 문자셋 디코딩 + HTTP 에러 → 한국어 메시지 변환.
 // 429 응답 시 지수 백오프로 최대 retries회 재시도.
+// 네트워크 요청은 safeFetch로 보내 SSRF(내부망/리다이렉트/DNS 리바인딩)와
+// 무응답(타임아웃)을 방어한다.
+import { safeFetch } from '../safe-fetch'
 
 const FETCH_HEADERS = {
   'User-Agent':
@@ -22,10 +25,7 @@ function toHttpError(status: number): string {
 
 export async function fetchHtml(url: string, retries = 3): Promise<string> {
   for (let attempt = 1; attempt <= retries; attempt++) {
-    const res = await fetch(url, {
-      headers: FETCH_HEADERS,
-      next: { revalidate: 0 },
-    })
+    const res = await safeFetch(url, { headers: FETCH_HEADERS })
 
     if (res.ok) {
       const buf = await res.arrayBuffer()

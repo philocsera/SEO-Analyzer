@@ -132,7 +132,8 @@ export default function Home() {
       const { saveResult } = await import('@/lib/result-cache')
       saveResult(data)
       await refreshHistory()
-      router.push(`/result/${encodeURIComponent(finalUrl)}`)
+      // data.url(정규화된 URL)로 라우팅해야 서버 캐시 키와 일치 → 공유 링크가 동작.
+      router.push(`/result/${encodeURIComponent(data.url)}`)
     } catch (e) {
       setError(e instanceof Error ? e.message : '분석 중 오류가 발생했습니다.')
     } finally {

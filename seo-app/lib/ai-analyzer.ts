@@ -35,7 +35,13 @@ async function callAi(
     system: systemPrompt,
     messages: [{ role: 'user', content: prompt }],
   })
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
+  // content[0]을 그대로 가정하면 빈 응답·비-text 블록(거부 등)에서 깨진다.
+  // 첫 text 블록을 안전하게 찾고, 없으면 명시적 에러로 처리한다.
+  const textBlock = response.content.find((b) => b.type === 'text')
+  const text = textBlock?.type === 'text' ? textBlock.text : ''
+  if (!text) {
+    throw new Error('AI 분석 응답이 비어 있습니다. 잠시 후 다시 시도해 주세요.')
+  }
   return parseAiJson<AiAnalysis>(text)
 }
 

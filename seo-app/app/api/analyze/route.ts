@@ -9,9 +9,14 @@ import { estimateRevenue } from '@/lib/revenue-estimator'
 import { buildBrandAwarenessFromSearch } from '@/lib/brand-search'
 import { AnalysisResult } from '@/types/analysis'
 import { buildKeywords, guardAnalyzeRequest } from '@/lib/analyze-common'
+import { getCachedResult, cacheResult } from '@/lib/server-result-store'
+import { consumeGlobalDailyQuota } from '@/lib/global-limit'
 import { randomUUID } from 'crypto'
 
 export const maxDuration = 120
+
+// 클라이언트 입력 문제(예: 스토어 식별자 누락)를 500이 아닌 400으로 내려주기 위한 마커.
+class BadRequestError extends Error {}
 
 const SMARTSTORE_DATA_LIMITATIONS = [
   '리뷰 수·평점·판매량은 네이버 공식 API에서 제공하지 않아 분석에서 제외됩니다.',
@@ -20,13 +25,10 @@ const SMARTSTORE_DATA_LIMITATIONS = [
   '본 분석은 네이버 검색 API(쇼핑·웹·블로그) 및 검색광고 API의 공식 데이터만을 사용합니다.',
 ]
 
-async function analyzeSmartStoreFlow(normalizedUrl: string): Promise<NextResponse> {
+async function analyzeSmartStoreFlow(normalizedUrl: string): Promise<AnalysisResult> {
   const slug = extractStoreSlug(normalizedUrl)
   if (!slug) {
-    return NextResponse.json(
-      { error: '스마트스토어 URL에서 스토어 식별자를 찾을 수 없습니다.' },
-      { status: 400 },
-    )
+    throw new BadRequestError('스마트스토어 URL에서 스토어 식별자를 찾을 수 없습니다.')
   }
 
   const smartstore = await parseSmartStore(normalizedUrl)
@@ -67,10 +69,10 @@ async function analyzeSmartStoreFlow(normalizedUrl: string): Promise<NextRespons
       : undefined,
   }
 
-  return NextResponse.json(result)
+  return result
 }
 
-async function analyzeWebsiteFlow(normalizedUrl: string): Promise<NextResponse> {
+async function analyzeWebsiteFlow(normalizedUrl: string): Promise<AnalysisResult> {
   const crawlData = await crawlUrl(normalizedUrl)
 
   const seoItems = buildSeoChecklist(crawlData)
@@ -99,18 +101,36 @@ async function analyzeWebsiteFlow(normalizedUrl: string): Promise<NextResponse> 
     revenueEstimate: estimateRevenue(crawlData, dartInfo) ?? undefined,
   }
 
-  return NextResponse.json(result)
+  return result
 }
 
 export async function POST(req: NextRequest) {
   const guard = await guardAnalyzeRequest(req)
   if (!guard.ok) return guard.response
 
+  // 같은 URL 최근 분석이 있으면 재사용 → AI 비용 절감 + 결과 공유 링크 지원.
+  const cached = await getCachedResult(guard.url)
+  if (cached) return NextResponse.json(cached)
+
+  // 실제 AI 분석(비용 발생) 직전에 전역 일일 상한 확인.
+  const quota = await consumeGlobalDailyQuota()
+  if (!quota.allowed) {
+    return NextResponse.json(
+      { error: '오늘 분석 요청이 많아 일일 한도에 도달했습니다. 내일 다시 시도해 주세요.' },
+      { status: 503 },
+    )
+  }
+
   try {
-    return isSmartStore(guard.url)
+    const result = isSmartStore(guard.url)
       ? await analyzeSmartStoreFlow(guard.url)
       : await analyzeWebsiteFlow(guard.url)
+    await cacheResult(result)
+    return NextResponse.json(result)
   } catch (err) {
+    if (err instanceof BadRequestError) {
+      return NextResponse.json({ error: err.message }, { status: 400 })
+    }
     const message = err instanceof Error ? err.message : '분석 실패'
     return NextResponse.json({ error: message }, { status: 500 })
   }
