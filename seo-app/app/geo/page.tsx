@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Sparkles,
   Globe,
@@ -13,6 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { ResultView, type GeoAnalyzeResult } from "@/components/geo/result-view";
+import type { AnalysisReport } from "@/lib/geo/types";
 import { SiteNav } from "@/components/geo/site-nav";
 import { DEFAULT_REVIEW_MODEL } from "@/lib/geo/analyze/pricing";
 import { estimateCost, formatUSD } from "@/lib/geo/analyze/cost";
@@ -86,6 +88,7 @@ function hostnameOf(u: string) {
 }
 
 export default function GeoHome() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<string>(ANALYSIS_STAGES[0].label);
@@ -119,18 +122,21 @@ export default function GeoHome() {
         body: JSON.stringify({ url, verification: false }),
       });
       const data = await res.json();
-      const r: GeoAnalyzeResult = res.ok
-        ? { ok: true, report: data }
-        : { ok: false, error: data.error || "분석 실패" };
-      setResult(r);
-      if (r.ok) {
-        saveHistoryEntry({
-          url: r.report.url,
-          overallScore: r.report.scores.overall,
-          analyzedAt: r.report.fetchedAt,
-        });
-        setHistory(loadHistory());
+      if (!res.ok) {
+        setResult({ ok: false, error: data.error || "분석 실패" });
+        return;
       }
+      const report = data as AnalysisReport;
+      saveHistoryEntry({
+        url: report.url,
+        overallScore: report.scores.overall,
+        analyzedAt: report.fetchedAt,
+      });
+      // 결과 페이지로 이동(공유 가능 URL). sessionStorage로 같은 세션 즉시 표시,
+      // 서버 공유 저장본은 다른 기기/사용자가 열 때 사용된다. report.url(서버 정규화
+      // URL)로 라우팅해야 서버 저장 키와 일치 → 공유 링크가 동작.
+      sessionStorage.setItem("geo_result", JSON.stringify(report));
+      router.push(`/geo/result/${encodeURIComponent(report.url)}`);
     } catch {
       setResult({ ok: false, error: "분석 중 오류가 발생했습니다." });
     } finally {
