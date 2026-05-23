@@ -22,7 +22,7 @@ const ReviewSchema = z.object({
       }),
     )
     .min(1)
-    .max(5),
+    .max(3),
   simulatedQAs: z
     .array(
       z.object({
@@ -70,7 +70,7 @@ export async function runLLMReview(
 사용자는 자신의 페이지가 ChatGPT/Claude/Perplexity 같은 LLM 답변에 인용되길 원합니다.
 
 규칙:
-1) 페이지 시그널과 본문 발췌를 보고 *구체적인 문장 단위*로 before/after 개선안을 만드세요.
+1) 페이지 시그널과 본문 발췌를 보고 *구체적인 문장 단위*로 before/after 개선안을 가장 임팩트 큰 순서로 최대 3개 만드세요.
    - "where"는 어느 부분인지 한 줄로 명시 (예: "본문 2번째 단락", "첫 H2 직전")
    - before/after는 실제 문장이어야 합니다 (메타 설명 X)
 2) 이 페이지가 자신 있게 답할 수 있는 사용자 질문을 2~3개 만드세요.
@@ -105,9 +105,10 @@ ${bodyExcerpt}`;
     prompt: userPrompt,
     temperature: 0.3,
     maxOutputTokens: 4096,
-    // 리뷰가 길어져 함수 한도(Hobby 60s)를 위협하지 않도록 30s에서 중단.
+    // 리뷰가 길어져 함수 한도(Hobby 60s)를 위협하지 않도록 45s에서 중단(보통 리뷰는
+    // 30~40s 소요 → 완료 가능, 그 이상 걸리는 무거운 페이지만 graceful하게 잘림).
     // 중단되면 compose의 try/catch가 잡아 llmReview=null로 휴리스틱 리포트만 정상 반환.
-    abortSignal: AbortSignal.timeout(30_000),
+    abortSignal: AbortSignal.timeout(45_000),
   });
 
   return {
