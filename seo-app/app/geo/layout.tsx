@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-const GEO_TITLE = "GEO Optimizer — AI 답변에 인용되는 페이지인가요?";
+const GEO_TITLE = "GEO Analyzer — AI 답변에 인용되는 페이지인가요?";
 const GEO_DESC =
   "ChatGPT · Claude · Perplexity · Google AI Overviews에 인용될 가능성을 진단하고 개선안을 제공합니다.";
 
@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     title: GEO_TITLE,
     description: GEO_DESC,
     url: "/geo",
-    siteName: "GEO Optimizer",
+    siteName: "GEO Analyzer",
     locale: "ko_KR",
     type: "website",
   },

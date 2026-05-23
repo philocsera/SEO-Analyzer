@@ -30,7 +30,7 @@ export default function TermsPage() {
         </div>
 
         <Section title="1. 서비스 개요">
-          본 서비스(SEO Analyzer / GEO Optimizer)는 사용자가 입력한 공개 웹페이지의 URL을
+          본 서비스(SEO Analyzer / GEO Analyzer)는 사용자가 입력한 공개 웹페이지의 URL을
           서버가 요청 시 1회 가져와 SEO·GEO 관점에서 분석하고 점수·개선안을 제공하는
           무료 도구입니다. 로그인 없이 이용할 수 있습니다.
         </Section>

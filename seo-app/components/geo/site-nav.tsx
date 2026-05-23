@@ -3,9 +3,6 @@ import { Sparkles, ArrowLeftRight } from "lucide-react";
 
 const NAV = [
   { href: "/geo", label: "분석" },
-  { href: "/geo/compare", label: "비교" },
-  { href: "/geo/site", label: "사이트" },
-  { href: "/geo/methodology", label: "Methodology" },
 ];
 
 export function SiteNav({ active }: { active?: string }) {
@@ -16,7 +13,7 @@ export function SiteNav({ active }: { active?: string }) {
           <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-lg text-white">GEO Optimizer</span>
+          <span className="font-bold text-lg text-white">GEO Analyzer</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           {NAV.map((item) => (

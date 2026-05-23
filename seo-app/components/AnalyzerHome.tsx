@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Search, Sparkles } from "lucide-react";
 import { SeoAnalyzer } from "@/components/SeoAnalyzer";
 import { GeoAnalyzer } from "@/components/geo/GeoAnalyzer";
@@ -28,7 +27,7 @@ export function AnalyzerHome({ initialMode }: { initialMode: Mode }) {
               )}
             </div>
             <span className="font-bold text-lg text-white">
-              {isGeo ? "GEO Optimizer" : "SEO Analyzer"}
+              {isGeo ? "GEO Analyzer" : "SEO Analyzer"}
             </span>
           </div>
 
@@ -41,20 +40,6 @@ export function AnalyzerHome({ initialMode }: { initialMode: Mode }) {
             </ToggleBtn>
           </div>
         </div>
-
-        {isGeo && (
-          <div className="max-w-6xl mx-auto mt-3 flex items-center gap-4 text-sm">
-            <Link href="/geo/compare" className="text-slate-400 hover:text-slate-100 transition-colors">
-              비교
-            </Link>
-            <Link href="/geo/site" className="text-slate-400 hover:text-slate-100 transition-colors">
-              사이트
-            </Link>
-            <Link href="/geo/methodology" className="text-slate-400 hover:text-slate-100 transition-colors">
-              Methodology
-            </Link>
-          </div>
-        )}
       </header>
 
       {isGeo ? <GeoAnalyzer /> : <SeoAnalyzer />}

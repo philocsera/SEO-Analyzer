@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sparkles, Globe, Search, Quote, BookOpenCheck, Layers, ShieldCheck, History, X } from "lucide-react";
-import Link from "next/link";
 import { ResultView, type GeoAnalyzeResult } from "@/components/geo/result-view";
 import type { AnalysisReport } from "@/lib/geo/types";
 
@@ -285,11 +284,7 @@ export function GeoAnalyzer() {
           )}
 
           <p className="max-w-6xl mx-auto px-6 pb-16 text-xs text-slate-600 text-center">
-            이 점수는 휴리스틱이며 실측 인용률이 아닙니다. 자세한 산정 방식은{" "}
-            <Link href="/geo/methodology" className="underline hover:text-slate-400">
-              Methodology
-            </Link>{" "}
-            페이지를 보세요.
+            이 점수는 휴리스틱이며 실측 인용률이 아닙니다.
           </p>
         </>
       )}
