@@ -4,6 +4,7 @@ import { Sparkles, ArrowLeftRight } from "lucide-react";
 const NAV = [
   { href: "/geo", label: "분석" },
   { href: "/geo/compare", label: "비교" },
+  { href: "/geo/site", label: "사이트" },
   { href: "/geo/methodology", label: "Methodology" },
 ];
 
