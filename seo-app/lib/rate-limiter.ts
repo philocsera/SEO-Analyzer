@@ -1,4 +1,4 @@
-// 분석 엔드포인트(/api/analyze)는 1회당 Anthropic 비용(~$0.06)이 발생하므로
+// 분석 엔드포인트(/api/analyze)는 1회당 OpenAI(AI) 비용이 발생하므로
 // 비용 어뷰징을 막아야 한다. Vercel 서버리스에서는 in-memory Map이 인스턴스마다·
 // 콜드스타트마다 리셋되어 사실상 제한이 안 걸리므로, Upstash Redis로 인스턴스 간
 // 공유 카운터를 둔다. Redis가 없으면(로컬·미설정 배포) in-memory로 폴백.

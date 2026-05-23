@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
-  serverExternalPackages: ['@anthropic-ai/sdk', '@react-pdf/renderer'],
+  serverExternalPackages: ['openai', '@react-pdf/renderer'],
 };
 
 export default nextConfig;

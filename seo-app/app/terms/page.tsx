@@ -59,7 +59,7 @@ export default function TermsPage() {
         <Section title="5. 외부 데이터 출처">
           본 서비스는 다음 외부 데이터·API를 사용하며, 각 데이터의 이용은 해당 제공처의
           약관을 따릅니다: Google PageSpeed Insights(Core Web Vitals), 금융감독원 DART(기업
-          공시), 네이버 검색/쇼핑/검색광고 API, Anthropic Claude(AI 분석).
+          공시), 네이버 검색/쇼핑/검색광고 API, OpenAI(AI 분석).
         </Section>
 
         <Section title="6. 문의">

@@ -45,11 +45,14 @@ export const PRICING: Record<ModelId, ModelPrice> = {
   },
 };
 
-export const DEFAULT_REVIEW_MODEL: ModelId = "anthropic/claude-sonnet-4-6";
-export const DEFAULT_VERIFICATION_MODELS: ModelId[] = [
-  "anthropic/claude-sonnet-4-6",
-  "openai/gpt-5",
-];
+export const DEFAULT_REVIEW_MODEL: ModelId = "openai/gpt-5";
+export const DEFAULT_VERIFICATION_MODELS: ModelId[] = ["openai/gpt-5"];
+
+// GPT-5 / o-시리즈는 추론 모델 → temperature 커스텀 미지원, reasoning_effort 사용.
+// 호출부에서 파라미터를 분기하기 위한 판별 헬퍼(프로바이더 prefix 유무 모두 허용).
+export function isReasoningModel(id: ModelId | string): boolean {
+  return /(^|\/)(gpt-5|o[134])(\b|-)/.test(id);
+}
 
 export const TOKEN_BUDGET = {
   review: { input: 8000, output: 2000 },

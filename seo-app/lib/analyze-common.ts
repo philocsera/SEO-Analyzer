@@ -25,11 +25,11 @@ export type GuardFail = { ok: false; response: NextResponse }
 // 환경변수 + 레이트리밋 + URL 정규화 + SSRF 가드를 한 번에 처리한다.
 // 통과 시 정규화된 URL을 반환, 실패 시 NextResponse를 반환.
 export async function guardAnalyzeRequest(req: NextRequest): Promise<GuardOk | GuardFail> {
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!process.env.OPENAI_API_KEY) {
     return {
       ok: false,
       response: NextResponse.json(
-        { error: '서버 설정 오류: ANTHROPIC_API_KEY 미설정. 관리자에게 문의하세요.' },
+        { error: '서버 설정 오류: OPENAI_API_KEY 미설정. 관리자에게 문의하세요.' },
         { status: 503 },
       ),
     }

@@ -1,13 +1,13 @@
 import { generateObject } from "ai";
-import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import type { LlmReview, PageSignals } from "../types";
-import { DEFAULT_REVIEW_MODEL, type ModelId } from "./pricing";
+import { DEFAULT_REVIEW_MODEL, isReasoningModel, type ModelId } from "./pricing";
 
-// 리뷰 모델은 항상 Claude("anthropic/..."). Vercel AI Gateway(카드 필요) 대신
-// @ai-sdk/anthropic로 직접 호출한다(SEO와 동일하게 ANTHROPIC_API_KEY 사용 → 카드 불필요).
+// 리뷰 모델은 항상 OpenAI("openai/..."). Vercel AI Gateway(카드 필요) 대신
+// @ai-sdk/openai로 직접 호출한다(SEO와 동일하게 OPENAI_API_KEY 사용 → 카드 불필요).
 function reviewModel(id: ModelId) {
-  return anthropic(id.replace(/^anthropic\//, ""));
+  return openai(id.replace(/^openai\//, ""));
 }
 
 const ReviewSchema = z.object({
@@ -98,13 +98,20 @@ ${JSON.stringify(sigSummary, null, 2)}
 # Body excerpt (truncated)
 ${bodyExcerpt}`;
 
+  // GPT-5 등 추론 모델은 temperature 커스텀 미지원(전달 시 에러) → 비-추론 모델일 때만 지정.
+  // 추론 모델은 reasoning_effort 'low'로 지연을 줄이고, 추론 토큰이 출력 예산을 함께
+  // 소비하므로 maxOutputTokens에 헤드룸을 둔다.
+  const reasoning = isReasoningModel(model);
   const { object, usage } = await generateObject({
     model: reviewModel(model),
     schema: ReviewSchema,
     system: lang === "ko" ? sysKo : sysEn,
     prompt: userPrompt,
-    temperature: 0.3,
-    maxOutputTokens: 4096,
+    ...(reasoning ? {} : { temperature: 0.3 }),
+    maxOutputTokens: reasoning ? 8000 : 4096,
+    providerOptions: reasoning
+      ? { openai: { reasoningEffort: "low" } }
+      : undefined,
     // 리뷰가 길어져 함수 한도(Hobby 60s)를 위협하지 않도록 45s에서 중단(보통 리뷰는
     // 30~40s 소요 → 완료 가능, 그 이상 걸리는 무거운 페이지만 graceful하게 잘림).
     // 중단되면 compose의 try/catch가 잡아 llmReview=null로 휴리스틱 리포트만 정상 반환.

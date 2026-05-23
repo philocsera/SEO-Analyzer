@@ -1,5 +1,6 @@
 import { generateText } from "ai";
-import type { ModelId } from "./pricing";
+import { openai } from "@ai-sdk/openai";
+import { isReasoningModel, type ModelId } from "./pricing";
 import type { LlmReview, VerificationResult } from "../types";
 
 export type VerificationModelUsage = {
@@ -23,11 +24,14 @@ export async function runVerification(
     const modelRuns: VerificationResult["runs"][number]["runs"] = [];
     let inT = 0;
     let outT = 0;
+    const reasoning = isReasoningModel(model);
     for (const question of questions) {
       const { text, usage } = await generateText({
-        model,
+        // 프로바이더 prefix(openai/...)를 제거하고 OpenAI 프로바이더로 직접 호출.
+        model: openai(model.replace(/^[a-z]+\//, "")),
         prompt: question,
-        temperature: 0.2,
+        // 추론 모델은 temperature 커스텀 미지원 → 비-추론 모델일 때만 지정.
+        ...(reasoning ? {} : { temperature: 0.2 }),
       });
       inT += usage?.inputTokens ?? 0;
       outT += usage?.outputTokens ?? 0;

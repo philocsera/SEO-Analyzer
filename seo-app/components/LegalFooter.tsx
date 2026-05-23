@@ -16,7 +16,7 @@ export default function LegalFooter() {
         </p>
         <p>
           데이터 출처: Google PageSpeed Insights · 금융감독원 DART · 네이버 검색/쇼핑/검색광고
-          API · Anthropic Claude. 각 데이터는 해당 제공처의 이용약관을 따릅니다.
+          API · OpenAI. 각 데이터는 해당 제공처의 이용약관을 따릅니다.
         </p>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 pt-1">
           <Link href="/terms" className="hover:text-slate-300 transition-colors">
