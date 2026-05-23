@@ -144,9 +144,5 @@ export async function analyzeUrl(
     llmReview,
     verification,
     cost,
-    disclaimer:
-      opts.lang === "ko"
-        ? "이 점수는 휴리스틱이며 실측 인용률이 아닙니다. 자세한 산정 방식은 /methodology 페이지에서 확인하세요."
-        : "This score is heuristic and not a measured citation rate. See /methodology for details.",
   };
 }

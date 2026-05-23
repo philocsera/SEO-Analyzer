@@ -56,8 +56,3 @@ export const LLM_BOTS = [
   "cohere-ai",
   "Diffbot",
 ] as const;
-
-export const RATE_LIMIT = {
-  perIpPerDay: 2,
-  windowSeconds: 24 * 60 * 60,
-} as const;

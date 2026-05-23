@@ -123,8 +123,14 @@ export function SeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: finalUrl }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || '분석 실패')
+      // 타임아웃 등으로 응답이 잘리면 res.json()이 throw → null 처리해 raw 파싱 에러 노출 방지
+      const data = await res.json().catch(() => null)
+      if (!res.ok || !data) {
+        throw new Error(
+          (data && data.error) ||
+            '분석에 실패했어요. 페이지가 무겁거나 시간이 초과됐을 수 있어요. 잠시 후 다시 시도해 주세요.',
+        )
+      }
       sessionStorage.setItem('seo_result', JSON.stringify(data))
       const { saveResult } = await import('@/lib/result-cache')
       saveResult(data)

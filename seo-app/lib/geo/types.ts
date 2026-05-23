@@ -211,5 +211,4 @@ export type AnalysisReport = {
   llmReview: LlmReview | null;
   verification: VerificationResult | null;
   cost: CostBreakdown;
-  disclaimer: string;
 };

@@ -227,7 +227,6 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
         </>
       )}
 
-      <p className="text-xs text-slate-600 text-center pt-2">{r.disclaimer}</p>
     </div>
   );
 }
@@ -333,35 +332,16 @@ function PillBadge({
   );
 }
 
+// API(/api/geo/analyze)가 이미 사용자용 메시지로 변환해 내려주고, GeoAnalyzer도
+// 친절 메시지를 넣으므로 여기서는 그대로 표시한다.
 function ErrorAlert({ error }: { error: string }) {
-  let title = "분석 실패";
-  let detail = error;
-  if (error === "RATE_LIMITED") {
-    title = "일일 한도 초과";
-    detail = "오늘 사용 가능한 2회를 모두 소진했습니다. 24시간 뒤 다시 시도해주세요.";
-  } else if (error.startsWith("URL_GUARD:invalid")) {
-    title = "URL 형식 오류";
-    detail = "유효한 http(s) URL을 입력해주세요.";
-  } else if (error.startsWith("URL_GUARD:scheme")) {
-    title = "지원하지 않는 스킴";
-    detail = "http:// 또는 https:// URL만 분석할 수 있습니다.";
-  } else if (error.startsWith("URL_GUARD:ssrf")) {
-    title = "내부/사설 IP 차단";
-    detail = "보안상 내부망 주소는 분석할 수 없습니다.";
-  } else if (error.includes("SSRF_BLOCKED")) {
-    title = "내부/사설 IP 차단";
-    detail = "이 URL이 내부망 주소로 리다이렉트되어 보안상 분석을 중단했습니다.";
-  } else if (error.startsWith("FETCH_FAILED")) {
-    title = "페이지 가져오기 실패";
-    detail = error.split(":").slice(2).join(":") || error;
-  }
   return (
     <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6">
       <div className="flex items-start gap-3">
         <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
         <div>
-          <h3 className="font-semibold text-red-300">{title}</h3>
-          <p className="text-sm text-red-200/80 mt-1">{detail}</p>
+          <h3 className="font-semibold text-red-300">분석 실패</h3>
+          <p className="text-base text-red-200/80 mt-1">{error}</p>
         </div>
       </div>
     </div>
