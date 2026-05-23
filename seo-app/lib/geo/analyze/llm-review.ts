@@ -1,7 +1,14 @@
 import { generateObject } from "ai";
+import { anthropic } from "@ai-sdk/anthropic";
 import { z } from "zod";
 import type { LlmReview, PageSignals } from "../types";
 import { DEFAULT_REVIEW_MODEL, type ModelId } from "./pricing";
+
+// 리뷰 모델은 항상 Claude("anthropic/..."). Vercel AI Gateway(카드 필요) 대신
+// @ai-sdk/anthropic로 직접 호출한다(SEO와 동일하게 ANTHROPIC_API_KEY 사용 → 카드 불필요).
+function reviewModel(id: ModelId) {
+  return anthropic(id.replace(/^anthropic\//, ""));
+}
 
 const ReviewSchema = z.object({
   summary: z.string().max(800),
@@ -90,7 +97,7 @@ ${JSON.stringify(sigSummary, null, 2)}
 ${bodyExcerpt}`;
 
   const { object, usage } = await generateObject({
-    model,
+    model: reviewModel(model),
     schema: ReviewSchema,
     system: lang === "ko" ? sysKo : sysEn,
     prompt: userPrompt,
