@@ -157,9 +157,9 @@ export function SeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
           SEO 종합 보고서를 무료로 받아보세요.
         </p>
 
-        {/* SEO/GEO 토글 — URL 입력칸 바로 위 */}
+        {/* SEO/GEO 토글 — URL 입력칸 바로 위. 분석 중엔 잠가 전환으로 끊기지 않게. */}
         <div className="flex justify-center mb-4">
-          <ModeToggle mode={mode} onChange={onModeChange} />
+          <ModeToggle mode={mode} onChange={onModeChange} disabled={loading} />
         </div>
 
         {/* URL 입력 */}

@@ -145,9 +145,9 @@ export function GeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
           출처·통계·문장 인용성·크롤러 접근성으로 진단합니다.
         </p>
 
-        {/* SEO/GEO 토글 — URL 입력칸 바로 위 */}
+        {/* SEO/GEO 토글 — URL 입력칸 바로 위. 분석 중엔 잠가 전환으로 끊기지 않게. */}
         <div className="flex justify-center mb-4">
-          <ModeToggle mode={mode} onChange={onModeChange} />
+          <ModeToggle mode={mode} onChange={onModeChange} disabled={loading} />
         </div>
 
         <form onSubmit={submit} className="max-w-2xl mx-auto">
