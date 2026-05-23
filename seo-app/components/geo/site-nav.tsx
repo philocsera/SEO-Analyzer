@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Sparkles, ArrowLeftRight } from "lucide-react";
 
-// MVP: 단일 URL 분석(/geo) + Methodology만. 비교·사이트진단·리더보드는 후속.
 const NAV = [
   { href: "/geo", label: "분석" },
+  { href: "/geo/compare", label: "비교" },
   { href: "/geo/methodology", label: "Methodology" },
 ];
 
