@@ -7,7 +7,6 @@ import {
 } from "@/lib/geo/analyze/thresholds";
 import {
   DEFAULT_REVIEW_MODEL,
-  DEFAULT_VERIFICATION_MODELS,
   PRICING,
   TOKEN_BUDGET,
 } from "@/lib/geo/analyze/pricing";
@@ -50,8 +49,7 @@ export default function MethodologyPage() {
           <p className="text-slate-400 leading-relaxed">
             이 도구는 <strong className="text-slate-200">휴리스틱 진단기</strong>입니다.
             LLM이 답변에 인용할 때 선호한다고 알려진 신호에 기반해 점수를 매깁니다.
-            점수가 높다고 인용률이 보장되는 것은 아니며, 검증 모드를 켜면 실제 LLM
-            응답에 이 페이지가 인용되는지 표본 측정합니다.
+            점수가 높다고 실제 인용이 보장되는 것은 아닙니다.
           </p>
         </div>
 
@@ -209,28 +207,7 @@ export default function MethodologyPage() {
           </p>
         </Block>
 
-        <Block title="6. 검증 모드">
-          <p className="text-slate-400 mb-3">
-            시뮬레이션 질문 {TOKEN_BUDGET.verificationQuestionsPerModel}개를 다음
-            모델 각각에 질의하고, 응답 텍스트에서 본 도메인이 인용되었는지
-            검사합니다.
-          </p>
-          <div className="space-y-2">
-            {DEFAULT_VERIFICATION_MODELS.map((m) => (
-              <div
-                key={m}
-                className="bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-3 flex items-center justify-between"
-              >
-                <code className="text-sm text-violet-300">{m}</code>
-                <span className="text-xs text-slate-500 font-mono">
-                  in ${PRICING[m].inputPerM} · out ${PRICING[m].outputPerM} / M
-                </span>
-              </div>
-            ))}
-          </div>
-        </Block>
-
-        <Block title="7. 비용">
+        <Block title="6. 비용">
           <Table>
             <thead>
               <tr>
@@ -264,7 +241,7 @@ export default function MethodologyPage() {
           </p>
         </Block>
 
-        <Block title="8. 사용 한도">
+        <Block title="7. 사용 한도">
           <p className="text-slate-400 leading-relaxed mb-3">
             분석은 SEO 도구와 동일한 비용 방어 가드를 공유합니다. IP 기준{" "}
             <strong className="text-slate-200">분당 3회 · 시간당 10회</strong>로
@@ -282,7 +259,7 @@ export default function MethodologyPage() {
           </p>
         </Block>
 
-        <Block title="9. 한계 (정직한 면책)">
+        <Block title="8. 한계 (정직한 면책)">
           <ul className="space-y-3 text-sm text-slate-400 leading-relaxed">
             <li>
               · 이 점수는{" "}
@@ -290,7 +267,7 @@ export default function MethodologyPage() {
                 휴리스틱이지 실측 인용률이 아닙니다.
               </strong>{" "}
               점수가 같은 두 페이지 중 어느 쪽이 실제로 더 자주 인용되는지는
-              검증 모드 또는 외부 측정이 필요합니다.
+              외부 측정이 필요합니다.
             </li>
             <li>
               · “자족적 문장”, “정의형 문장” 판정은 정규식 기반 휴리스틱으로

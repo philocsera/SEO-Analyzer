@@ -23,9 +23,6 @@ export async function POST(req: NextRequest) {
   if (!rawUrl || typeof rawUrl !== 'string') {
     return NextResponse.json({ error: 'URL이 필요합니다.' }, { status: 400 })
   }
-  // MVP: 검증 모드는 기본 비활성(비용 큼). 후속 단계에서 토글 제공.
-  const verification = body?.verification === true
-
   let normalizedUrl = rawUrl.trim()
   if (!normalizedUrl.startsWith('http')) normalizedUrl = 'https://' + normalizedUrl
 
@@ -53,7 +50,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const report = await analyzeUrl(normalizedUrl, { lang: 'ko', verification })
+    // 검증 모드(실제 LLM 질의)는 보류 — 항상 휴리스틱 + LLM 정성 리뷰만 수행.
+    const report = await analyzeUrl(normalizedUrl, { lang: 'ko', verification: false })
     // LLM 리뷰가 정상 생성됐거나(또는 게이트 차단으로 애초에 AI 불필요) 결정적인
     // 결과만 비용 캐시한다. 일시적 AI 실패로 빈약한 리포트가 24h 캐시되는 것을 방지.
     if (report.llmReview !== null || !report.gate.passed) {

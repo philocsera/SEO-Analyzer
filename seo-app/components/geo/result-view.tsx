@@ -7,7 +7,6 @@ import {
   ExternalLink,
   Calendar,
   FileText,
-  Bot,
   Quote,
 } from "lucide-react";
 import { ScoreGauge } from "@/components/geo/score-gauge";
@@ -229,57 +228,6 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
             </ul>
           </Section>
         </>
-      )}
-
-      {r.verification && (
-        <Section title="실제 LLM 검증 결과" defaultOpen>
-          <div className="space-y-6">
-            {r.verification.runs.map((mr) => (
-              <div key={mr.model}>
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-200">
-                  <Bot className="w-4 h-4 text-violet-400" />
-                  {mr.model}
-                </div>
-                <div className="space-y-2">
-                  {mr.runs.map((run, i) => (
-                    <div
-                      key={i}
-                      className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-4"
-                    >
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="font-medium text-sm text-slate-200">
-                          Q. {run.question}
-                        </div>
-                        <PillBadge variant={run.citedThisDomain ? "success" : "muted"}>
-                          {run.citedThisDomain ? "도메인 인용" : "미인용"}
-                        </PillBadge>
-                      </div>
-                      <div className="text-sm text-slate-400 whitespace-pre-wrap leading-relaxed">
-                        {run.answer}
-                      </div>
-                      {run.citedUrls.length > 0 && (
-                        <div className="mt-3 text-xs text-slate-500">
-                          <span>언급 URL: </span>
-                          {run.citedUrls.map((u) => (
-                            <a
-                              key={u}
-                              href={u}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="break-all text-violet-400 hover:text-violet-300 mr-2 underline"
-                            >
-                              {u}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
       )}
 
       <p className="text-xs text-slate-600 text-center pt-2">{r.disclaimer}</p>
