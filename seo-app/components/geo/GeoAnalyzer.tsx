@@ -6,8 +6,6 @@ import { Sparkles, Globe, Search, Quote, BookOpenCheck, Layers, ShieldCheck, His
 import Link from "next/link";
 import { ResultView, type GeoAnalyzeResult } from "@/components/geo/result-view";
 import type { AnalysisReport } from "@/lib/geo/types";
-import { DEFAULT_REVIEW_MODEL } from "@/lib/geo/analyze/pricing";
-import { estimateCost, formatUSD } from "@/lib/geo/analyze/cost";
 
 const FEATURES = [
   { icon: BookOpenCheck, title: "Citability", desc: "출처·통계·인용가능성 진단" },
@@ -84,11 +82,6 @@ export function GeoAnalyzer() {
   const [stage, setStage] = useState<string>(ANALYSIS_STAGES[0].label);
   const [result, setResult] = useState<GeoAnalyzeResult | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>(() => loadHistory());
-
-  const estimate = estimateCost({
-    reviewModel: DEFAULT_REVIEW_MODEL,
-    verificationModels: null,
-  });
 
   const submit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -193,13 +186,6 @@ export function GeoAnalyzer() {
                 </>
               )}
             </button>
-          </div>
-
-          <div className="mt-3 flex items-center justify-end gap-2 bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-3">
-            <span className="text-xs text-slate-500">예상 비용 (AI 리뷰)</span>
-            <span className="font-mono font-semibold text-violet-300">
-              {formatUSD(estimate.estimateUSD)}
-            </span>
           </div>
 
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
