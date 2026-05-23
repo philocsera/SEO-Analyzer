@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, Zap, BarChart2, FileText, Shield, Globe, Clock, X, History } from 'lucide-react'
+import { Search, BarChart2, FileText, Shield, Globe, Clock, X, History } from 'lucide-react'
 import type { AnalysisResult } from '@/types/analysis'
 import type { HistoryEntry } from '@/lib/result-cache'
+import { ModeToggle, type Mode } from '@/components/ModeToggle'
 
 function timeAgo(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
@@ -45,7 +46,7 @@ const ANALYSIS_STAGES = [
   { label: '다른 사용자 요청이 많아 잠시 대기 중… 평소보다 시간이 조금 더 걸려요', after: 70 },
 ] as const
 
-export function SeoAnalyzer() {
+export function SeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: (m: Mode) => void }) {
   const router = useRouter()
   const [url, setUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -142,11 +143,6 @@ export function SeoAnalyzer() {
     <>
       {/* 히어로 */}
       <section className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
-        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs px-4 py-2 rounded-full mb-8">
-          <Zap className="w-3 h-3" />
-          AI 기반 SEO 자동 분석
-        </div>
-
         <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
           URL 하나로
           <br />
@@ -160,6 +156,11 @@ export function SeoAnalyzer() {
           <br />
           SEO 종합 보고서를 무료로 받아보세요.
         </p>
+
+        {/* SEO/GEO 토글 — URL 입력칸 바로 위 */}
+        <div className="flex justify-center mb-4">
+          <ModeToggle mode={mode} onChange={onModeChange} />
+        </div>
 
         {/* URL 입력 */}
         <div className="max-w-2xl mx-auto">

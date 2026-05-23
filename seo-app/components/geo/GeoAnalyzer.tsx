@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Sparkles, Globe, Search, Quote, BookOpenCheck, Layers, ShieldCheck, History, X } from "lucide-react";
+import { Globe, Search, Quote, BookOpenCheck, Layers, ShieldCheck, History, X } from "lucide-react";
 import { ResultView, type GeoAnalyzeResult } from "@/components/geo/result-view";
 import type { AnalysisReport } from "@/lib/geo/types";
+import { ModeToggle, type Mode } from "@/components/ModeToggle";
 
 const FEATURES = [
   { icon: BookOpenCheck, title: "Citability", desc: "출처·통계·인용가능성 진단" },
@@ -22,12 +23,6 @@ const ANALYSIS_STAGES = [
   { label: "AI 리뷰 생성 중", after: 14 },
   { label: "거의 다 됐어요…", after: 40 },
 ] as const;
-
-const EXAMPLES = [
-  "https://vercel.com/docs/ai-gateway",
-  "https://ai-sdk.dev/docs",
-  "https://en.wikipedia.org/wiki/Large_language_model",
-];
 
 type HistoryEntry = {
   url: string;
@@ -74,7 +69,7 @@ function hostnameOf(u: string) {
   }
 }
 
-export function GeoAnalyzer() {
+export function GeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: (m: Mode) => void }) {
   const router = useRouter();
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -137,10 +132,6 @@ export function GeoAnalyzer() {
   return (
     <>
       <section className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
-        <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs px-4 py-2 rounded-full mb-8">
-          <Sparkles className="w-3 h-3" />
-          Generative Engine Optimization
-        </div>
         <h1 className="text-5xl font-bold text-white mb-6 leading-tight">
           URL 하나로
           <br />
@@ -153,6 +144,11 @@ export function GeoAnalyzer() {
           <br />
           출처·통계·문장 인용성·크롤러 접근성으로 진단합니다.
         </p>
+
+        {/* SEO/GEO 토글 — URL 입력칸 바로 위 */}
+        <div className="flex justify-center mb-4">
+          <ModeToggle mode={mode} onChange={onModeChange} />
+        </div>
 
         <form onSubmit={submit} className="max-w-2xl mx-auto">
           <div className="flex gap-3 bg-slate-800/60 border border-slate-700/50 rounded-2xl p-2 backdrop-blur-sm">
@@ -185,20 +181,6 @@ export function GeoAnalyzer() {
                 </>
               )}
             </button>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500">
-            <span>예시:</span>
-            {EXAMPLES.map((u) => (
-              <button
-                key={u}
-                type="button"
-                onClick={() => setUrl(u)}
-                className="rounded-full border border-slate-700/50 bg-slate-800/40 px-3 py-1 hover:border-slate-600 hover:text-slate-300 transition-colors"
-              >
-                {new URL(u).hostname}
-              </button>
-            ))}
           </div>
 
           {loading && (
