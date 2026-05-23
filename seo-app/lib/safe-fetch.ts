@@ -19,8 +19,15 @@ export class SsrfError extends Error {
 const PRIVATE_HOST_RE =
   /^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.|169\.254\.|0\.0\.0\.0|::1|fe80:|fc00:|fd[0-9a-f]{2}:)/i
 
+// 명시적으로 내부망을 가리키는 특수 TLD(mDNS·사내 도메인). 공인 사이트는 이 접미사로
+// 끝나지 않으므로 차단해도 정상 분석에 영향이 없다.
+const INTERNAL_SUFFIXES = ['.localhost', '.internal', '.local']
+
 export function isPrivateHostname(host: string): boolean {
-  return PRIVATE_HOST_RE.test(host) || host === '::'
+  const h = host.toLowerCase()
+  if (h === '::') return true
+  if (PRIVATE_HOST_RE.test(h)) return true
+  return INTERNAL_SUFFIXES.some((suffix) => h.endsWith(suffix))
 }
 
 // resolve된 "IP"가 사설/예약/멀티캐스트 대역인지.

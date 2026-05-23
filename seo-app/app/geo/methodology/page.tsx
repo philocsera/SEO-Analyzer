@@ -4,7 +4,6 @@ import {
   THRESHOLDS,
   WEIGHTS_BY_CATEGORY,
   LLM_BOTS,
-  RATE_LIMIT,
 } from "@/lib/geo/analyze/thresholds";
 import {
   DEFAULT_REVIEW_MODEL,
@@ -266,15 +265,20 @@ export default function MethodologyPage() {
         </Block>
 
         <Block title="8. 사용 한도">
+          <p className="text-slate-400 leading-relaxed mb-3">
+            분석은 SEO 도구와 동일한 비용 방어 가드를 공유합니다. IP 기준{" "}
+            <strong className="text-slate-200">분당 3회 · 시간당 10회</strong>로
+            제한하며(슬라이딩 윈도), IP는 Vercel이 셋팅하는 신뢰값을 사용합니다.
+            카운터는 Upstash Redis에 두어 서버리스 인스턴스 간 공유하고, Redis
+            장애 시 단일 인스턴스 in-memory로 폴백합니다.
+          </p>
           <p className="text-slate-400 leading-relaxed">
-            익명 IP 기준{" "}
+            여기에 더해 모든 사용자 합산 기준{" "}
             <strong className="text-slate-200">
-              일일 {RATE_LIMIT.perIpPerDay}회
+              전역 일일 한도(기본 300회/일)
             </strong>
-            . IP는 해시(SHA-256 앞 16바이트)로 저장하고, 윈도는{" "}
-            {RATE_LIMIT.windowSeconds / 3600}시간입니다. MVP는 in-memory 카운터를
-            사용하며, 프로덕션에서는 Upstash Redis 또는 Vercel KV 호환 스토리지로
-            교체할 수 있게 설계되었습니다.
+            를 둡니다(GEO 전용 카운터, SEO와 분리). 단, 같은 URL을 최근 분석한
+            적이 있으면 캐시된 결과를 재사용하므로 한도를 소비하지 않습니다.
           </p>
         </Block>
 
