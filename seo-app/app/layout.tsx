@@ -13,8 +13,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://seo-app-iota-nine.vercel.app"),
   title: "SEO Analyzer — AI 기반 SEO 자동 분석",
   description: "URL 하나로 SEO 현황, AI 브랜드 분석까지. 무료 SEO 종합 보고서.",
+  openGraph: {
+    title: "SEO Analyzer — AI 기반 SEO 자동 분석",
+    description: "URL 하나로 SEO 현황, AI 브랜드 분석까지. 무료 SEO 종합 보고서.",
+    url: "/",
+    siteName: "SEO Analyzer",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SEO Analyzer — AI 기반 SEO 자동 분석",
+    description: "URL 하나로 SEO 현황, AI 브랜드 분석까지.",
+  },
 };
 
 export default function RootLayout({
