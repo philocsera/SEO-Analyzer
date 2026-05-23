@@ -97,9 +97,15 @@ export function GeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, verification: false }),
       });
-      const data = await res.json();
-      if (!res.ok) {
-        setResult({ ok: false, error: data.error || "분석 실패" });
+      // 타임아웃 등으로 응답이 잘리면 res.json()이 깨진 JSON을 만나 throw → null로 처리.
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data) {
+        setResult({
+          ok: false,
+          error:
+            (data && data.error) ||
+            "분석에 실패했어요. 페이지가 무겁거나 시간이 초과됐을 수 있어요. 잠시 후 다시 시도해 주세요.",
+        });
         return;
       }
       const report = data as AnalysisReport;
@@ -111,7 +117,7 @@ export function GeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
       sessionStorage.setItem("geo_result", JSON.stringify(report));
       router.push(`/geo/result/${encodeURIComponent(report.url)}`);
     } catch {
-      setResult({ ok: false, error: "분석 중 오류가 발생했습니다." });
+      setResult({ ok: false, error: "분석 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." });
     } finally {
       clearInterval(interval);
       setLoading(false);

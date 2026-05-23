@@ -45,7 +45,9 @@ export async function runLLMReview(
   lang: "ko" | "en",
   model: ModelId = DEFAULT_REVIEW_MODEL,
 ): Promise<LlmReviewResult> {
-  const bodyExcerpt = signals.visibleText.slice(0, 24_000);
+  // 입력을 12k자로 제한: 무거운 페이지에서도 리뷰가 빨리 끝나 Hobby 60s 함수 한도를
+  // 넘기지 않도록(넘기면 응답이 잘려 클라이언트 JSON 파싱이 깨진다).
+  const bodyExcerpt = signals.visibleText.slice(0, 12_000);
   const sigSummary = {
     title: signals.title,
     wordCount: signals.wordCount,
@@ -102,6 +104,10 @@ ${bodyExcerpt}`;
     system: lang === "ko" ? sysKo : sysEn,
     prompt: userPrompt,
     temperature: 0.3,
+    maxOutputTokens: 4096,
+    // 리뷰가 길어져 함수 한도(Hobby 60s)를 위협하지 않도록 30s에서 중단.
+    // 중단되면 compose의 try/catch가 잡아 llmReview=null로 휴리스틱 리포트만 정상 반환.
+    abortSignal: AbortSignal.timeout(30_000),
   });
 
   return {
