@@ -11,12 +11,10 @@ import {
 } from "lucide-react";
 import { ScoreGauge } from "@/components/geo/score-gauge";
 import { Section } from "@/components/geo/section";
-import { formatUSD } from "@/lib/geo/analyze/cost";
 import type {
   AnalysisReport,
   Category,
   Contributor,
-  CostBreakdown,
   Finding,
   GateCheck,
   PageClassification,
@@ -82,7 +80,6 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
               <span>{analyzedAt}</span>
             </div>
           </div>
-          <CostBadge cost={r.cost} />
         </div>
 
         <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
@@ -98,7 +95,7 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
         </div>
 
         {r.scoreConfidence.level === "low" && r.gate.passed && (
-          <div className="mt-4 mx-auto max-w-2xl border border-amber-500/30 bg-amber-500/10 text-amber-200 text-sm rounded-xl px-4 py-3">
+          <div className="mt-4 mx-auto max-w-2xl border border-amber-500/30 bg-amber-500/10 text-amber-200 text-base rounded-xl px-4 py-3">
             <strong className="font-semibold">⚠ 점수 신뢰도 낮음</strong>
             <p className="mt-1 text-amber-100/80 leading-relaxed">
               {r.scoreConfidence.reason}
@@ -157,7 +154,7 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
                 </div>
               }
             >
-              <p className="text-xs text-slate-500 mb-3">{CATEGORY_DESC[cat]}</p>
+              <p className="text-sm text-slate-500 mb-3">{CATEGORY_DESC[cat]}</p>
               <ul className="space-y-3">
                 {cf.map((f) => (
                   <FindingRow key={f.id} finding={f} />
@@ -171,7 +168,7 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
       {r.llmReview && (
         <>
           <Section title="AI 리뷰 — 요약" defaultOpen>
-            <p className="text-sm text-slate-300 whitespace-pre-wrap leading-relaxed">
+            <p className="text-base text-slate-300 whitespace-pre-wrap leading-relaxed">
               {r.llmReview.summary}
             </p>
           </Section>
@@ -183,21 +180,21 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
                   key={i}
                   className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-4"
                 >
-                  <div className="mb-3 flex items-center gap-2 text-xs text-slate-500">
+                  <div className="mb-3 flex items-center gap-2 text-sm text-slate-500">
                     <FileText className="w-3.5 h-3.5" />
                     {rw.where}
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3">
-                      <div className="mb-1 text-xs font-medium text-red-400">현재</div>
-                      <div className="text-sm text-slate-300">{rw.before}</div>
+                      <div className="mb-1 text-sm font-medium text-red-400">현재</div>
+                      <div className="text-base text-slate-300">{rw.before}</div>
                     </div>
                     <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
-                      <div className="mb-1 text-xs font-medium text-emerald-400">개선안</div>
-                      <div className="text-sm text-slate-200">{rw.after}</div>
+                      <div className="mb-1 text-sm font-medium text-emerald-400">개선안</div>
+                      <div className="text-base text-slate-200">{rw.after}</div>
                     </div>
                   </div>
-                  <div className="mt-3 text-xs text-slate-400 flex items-start gap-2">
+                  <div className="mt-3 text-sm text-slate-400 flex items-start gap-2">
                     <span className="text-violet-400 font-medium">이유:</span>
                     <span>{rw.why}</span>
                   </div>
@@ -214,7 +211,7 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
                   className="rounded-xl border border-slate-700/40 bg-slate-900/40 p-4"
                 >
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <div className="font-medium text-sm text-slate-200 flex items-start gap-2">
+                    <div className="font-medium text-base text-slate-200 flex items-start gap-2">
                       <Quote className="w-4 h-4 text-violet-400 flex-shrink-0 mt-0.5" />
                       {q.question}
                     </div>
@@ -222,7 +219,7 @@ export function ResultView({ result }: { result: GeoAnalyzeResult }) {
                       {q.usesThisPage ? "인용 가능" : "인용 어려움"}
                     </PillBadge>
                   </div>
-                  <div className="text-sm text-slate-400">{q.likelyAnswer}</div>
+                  <div className="text-base text-slate-400">{q.likelyAnswer}</div>
                 </li>
               ))}
             </ul>
@@ -243,11 +240,11 @@ function GateFailBanner({ checks }: { checks: GateCheck[] }) {
         <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <h3 className="font-semibold text-red-300 mb-1">크롤러 게이트 차단됨</h3>
-          <p className="text-sm text-red-300/80 mb-3">
+          <p className="text-base text-red-300/80 mb-3">
             LLM 크롤러가 이 페이지에 접근할 수 없거나 본문이 추출되지 않습니다.
             점수 산정은 의미를 갖지 않습니다.
           </p>
-          <ul className="space-y-1 text-sm">
+          <ul className="space-y-1 text-base">
             {fails.map((c) => (
               <li key={c.id} className="text-red-200/90">
                 · {c.detail}
@@ -275,8 +272,8 @@ function GateCheckRow({ check }: { check: GateCheck }) {
     <li className="flex items-start gap-3">
       <Icon className={`w-4 h-4 mt-0.5 flex-shrink-0 ${cls}`} />
       <div className="flex-1">
-        <div className="text-sm font-medium text-slate-200">{label}</div>
-        <div className="text-xs text-slate-500">{check.detail}</div>
+        <div className="text-base font-medium text-slate-200">{label}</div>
+        <div className="text-sm text-slate-500">{check.detail}</div>
       </div>
     </li>
   );
@@ -287,17 +284,17 @@ function FindingRow({ finding }: { finding: Finding }) {
     <li className="flex items-start gap-3">
       <SeverityDot s={finding.severity} />
       <div className="flex-1">
-        <div className="font-medium text-sm text-slate-200">{finding.title}</div>
-        <div className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+        <div className="font-medium text-base text-slate-200">{finding.title}</div>
+        <div className="text-sm text-slate-400 mt-0.5 leading-relaxed">
           {finding.detail}
         </div>
         {finding.evidence && (
-          <div className="mt-2 rounded bg-slate-900/60 border border-slate-700/40 px-3 py-2 text-xs italic text-slate-400">
+          <div className="mt-2 rounded bg-slate-900/60 border border-slate-700/40 px-3 py-2 text-sm italic text-slate-400">
             “{finding.evidence}”
           </div>
         )}
         {finding.fix && (
-          <div className="mt-2 text-xs text-slate-300">
+          <div className="mt-2 text-sm text-slate-300">
             <span className="text-violet-400 font-medium">→ </span>
             {finding.fix}
           </div>
@@ -315,24 +312,6 @@ function SeverityDot({ s }: { s: Severity }) {
       ? "bg-amber-500"
       : "bg-emerald-500";
   return <span className={`mt-1.5 w-2 h-2 rounded-full flex-shrink-0 ${cls}`} />;
-}
-
-function CostBadge({ cost }: { cost: CostBreakdown }) {
-  return (
-    <div className="flex flex-col items-end gap-1">
-      <div className="text-xs text-slate-500">분석 비용</div>
-      <div className="flex items-center gap-2">
-        <span className="rounded-md border border-slate-700/40 bg-slate-900/40 px-2 py-1 text-xs font-mono text-slate-400">
-          추정 {formatUSD(cost.estimateUSD)}
-        </span>
-        {cost.actualUSD !== null && (
-          <span className="rounded-md border border-violet-500/30 bg-violet-500/10 px-2 py-1 text-xs font-mono text-violet-300">
-            실측 {formatUSD(cost.actualUSD)}
-          </span>
-        )}
-      </div>
-    </div>
-  );
 }
 
 function PillBadge({
