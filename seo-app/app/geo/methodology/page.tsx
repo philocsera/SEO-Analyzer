@@ -19,7 +19,7 @@ export const metadata = {
 export default function MethodologyPage() {
   return (
     <main className="min-h-screen">
-      <header className="border-b border-slate-800/50 px-6 py-4 sticky top-0 z-10 bg-[#0a0f1e]/85 backdrop-blur-sm">
+      <header data-chrome className="border-b border-slate-800/50 px-6 py-4 sticky top-0 z-10 bg-[#0a0f1e]/85 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <Link
             href="/geo"
@@ -282,7 +282,7 @@ export default function MethodologyPage() {
         </Block>
       </div>
 
-      <footer className="border-t border-slate-800/50 mt-16">
+      <footer data-chrome className="border-t border-slate-800/50 mt-16">
         <div className="max-w-6xl mx-auto px-6 py-6 text-xs text-slate-600">
           이 점수는 휴리스틱이며 실측 인용률이 아닙니다.
         </div>

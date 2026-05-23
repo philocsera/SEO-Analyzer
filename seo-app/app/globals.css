@@ -24,3 +24,10 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* iframe 임베드 모드(?embed=1): 메인 홈페이지가 자체 헤더·푸터를 가지므로
+   위젯 안의 네비·푸터·브랜딩 헤더(data-chrome)를 숨겨 컴팩트하게 보여준다.
+   레이아웃의 인라인 스크립트가 페인트 전에 html[data-embed]를 설정해 깜빡임이 없다. */
+html[data-embed] [data-chrome] {
+  display: none !important;
+}

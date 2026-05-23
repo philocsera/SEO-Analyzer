@@ -6,7 +6,7 @@ const GITHUB = "https://github.com/philocsera/SEO-Analyzer";
 // 휴리스틱·AI 생성 정보다(전문 자문 아님). 외부 데이터는 각 제공처 약관을 따른다.
 export default function LegalFooter() {
   return (
-    <footer className="border-t border-slate-800/60 bg-[#0a0f1e] text-slate-500">
+    <footer data-chrome className="border-t border-slate-800/60 bg-[#0a0f1e] text-slate-500">
       <div className="max-w-6xl mx-auto px-6 py-8 space-y-3 text-xs leading-relaxed">
         <p>
           본 도구는 사용자가 입력한 <strong className="text-slate-400">공개 웹페이지</strong>를

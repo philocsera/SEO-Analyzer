@@ -316,7 +316,7 @@ export default function GeoHome() {
         </>
       )}
 
-      <footer className="border-t border-slate-800/50 mt-16">
+      <footer data-chrome className="border-t border-slate-800/50 mt-16">
         <div className="max-w-6xl mx-auto px-6 py-6 text-xs text-slate-600">
           이 점수는 휴리스틱이며 실측 인용률이 아닙니다. 자세한 산정 방식은{" "}
           <a href="/geo/methodology" className="underline hover:text-slate-400">

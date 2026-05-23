@@ -145,7 +145,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-slate-100">
       {/* 헤더 */}
-      <header className="border-b border-slate-800/50 px-6 py-4">
+      <header data-chrome className="border-b border-slate-800/50 px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-blue-500 rounded-lg flex items-center justify-center">
