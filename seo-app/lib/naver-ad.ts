@@ -31,9 +31,18 @@ function toNum(v: string | number): number {
   return typeof v === 'number' ? v : parseInt(String(v).replace(/[^0-9]/g, '')) || 0
 }
 
+// 네이버 검색광고 API는 레이트리밋이 빡빡해 동시 호출 시 429가 난다.
+// 순차 호출 + 아래 간격으로 버스트를 피한다.
+const REQUEST_INTERVAL_MS = 350
+const sleep = (ms: number) => new Promise<void>(r => setTimeout(r, ms))
+
 async function queryKeywordList(hint: string): Promise<KeywordStat[]> {
   const path = '/keywordstool'
-  const params = new URLSearchParams({ hintKeywords: hint, showDetail: '1' })
+  // keywordstool은 공백이 포함된 hintKeywords를 거부한다(HTTP 400).
+  // 공백을 제거해 단일 토큰으로 보낸다. (예: "AI 마케팅 솔루션" → "AI마케팅솔루션")
+  const cleaned = hint.replace(/\s+/g, '')
+  if (!cleaned) return []
+  const params = new URLSearchParams({ hintKeywords: cleaned, showDetail: '1' })
   const res = await fetch(`https://api.searchad.naver.com${path}?${params}`, {
     headers: makeHeaders('GET', path),
     next: { revalidate: 3600 },
@@ -48,9 +57,12 @@ async function queryKeywordList(hint: string): Promise<KeywordStat[]> {
 
 function pickStat(list: KeywordStat[], keyword: string): KeywordStat | null {
   if (!list.length) return null
+  // relKeyword는 공백이 없는 형태로 오므로(예: "AI마케팅") 공백을 무시하고 매칭한다.
+  const norm = (s: string) => s.replace(/\s+/g, '')
+  const target = norm(keyword)
   return (
-    list.find(k => k.relKeyword === keyword) ??
-    list.find(k => k.relKeyword.includes(keyword) || keyword.includes(k.relKeyword)) ??
+    list.find(k => norm(k.relKeyword) === target) ??
+    list.find(k => norm(k.relKeyword).includes(target) || target.includes(norm(k.relKeyword))) ??
     list[0]
   )
 }
@@ -118,15 +130,13 @@ export async function getKeywordStats(
     return new Map()
   }
 
-  const entries = await Promise.all(
-    keywords.map(async (kw): Promise<[string, { searchVolume: string; competition: string } | null]> => [
-      kw,
-      await fetchKeywordStat(kw),
-    ]),
-  )
-
-  return new Map(
-    entries
-      .filter((e): e is [string, { searchVolume: string; competition: string }] => e[1] !== null)
-  )
+  // 병렬(Promise.all)은 버스트로 429를 유발하므로 순차 호출 + 간격으로 조회한다.
+  const result = new Map<string, { searchVolume: string; competition: string }>()
+  for (let i = 0; i < keywords.length; i++) {
+    const kw = keywords[i]
+    const stat = await fetchKeywordStat(kw)
+    if (stat) result.set(kw, stat)
+    if (i < keywords.length - 1) await sleep(REQUEST_INTERVAL_MS)
+  }
+  return result
 }

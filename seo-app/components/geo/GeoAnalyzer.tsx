@@ -270,10 +270,6 @@ export function GeoAnalyzer({ mode, onModeChange }: { mode: Mode; onModeChange: 
               </div>
             </section>
           )}
-
-          <p className="max-w-6xl mx-auto px-6 pb-16 text-xs text-slate-600 text-center">
-            이 점수는 휴리스틱이며 실측 인용률이 아닙니다.
-          </p>
         </>
       )}
     </>

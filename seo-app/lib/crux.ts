@@ -44,8 +44,10 @@ function formatDate(d: { year: number; month: number; day: number }): string {
 }
 
 export async function fetchCruxData(url: string): Promise<CruxData | null> {
-  const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY
-  if (!apiKey) return null
+  // 미설정(빈 값)이거나, README/.env.example의 예시 플레이스홀더(AIzaSyXXXX..., xxxx)를
+  // 지우지 않고 그대로 둔 경우 → 호출하지 않고 조용히 미표시. (선택 키이므로 에러 아님)
+  const apiKey = process.env.GOOGLE_PAGESPEED_API_KEY?.trim()
+  if (!apiKey || /x{4}/i.test(apiKey)) return null
 
   const origin = new URL(url).origin
 
@@ -65,8 +67,9 @@ export async function fetchCruxData(url: string): Promise<CruxData | null> {
     if (!res.ok || data.error) {
       if (res.status !== 404) {
         console.warn(
-          `[CrUX] 호출 실패 (status=${res.status}): ${data.error?.message ?? '알 수 없는 오류'} — ` +
-          `Chrome UX Report API 활성화 및 GOOGLE_PAGESPEED_API_KEY 권한을 확인하세요. (origin=${origin})`,
+          `[CrUX] Core Web Vitals 건너뜀 (status=${res.status}): ${data.error?.message ?? '알 수 없는 오류'} — ` +
+          `GOOGLE_PAGESPEED_API_KEY가 유효하지 않거나 Chrome UX Report API가 비활성입니다. ` +
+          `선택 기능이므로 나머지 분석은 정상 진행됩니다. (origin=${origin})`,
         )
       }
       return null
