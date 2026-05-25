@@ -177,7 +177,7 @@ cd seo-app
 npm install
 
 # 2. .env.local 생성 (위 환경 변수 참고)
-cp .env.local.example .env.local  # 또는 직접 생성
+cp .env.example .env.local  # 또는 직접 생성
 # → OPENAI_API_KEY 등 입력
 
 # 3. 개발 서버
@@ -206,7 +206,7 @@ node scripts/batch-pdf.mjs smartstore     # 5개 스마트스토어
 node scripts/batch-pdf.mjs niche          # 5개 소규모 서비스
 ```
 
-프리셋은 `scripts/presets.json`에 정의되어 있습니다. 결과 PDF는 `examples/` 디렉토리에 저장 (이 레포의 `examples/` 안에 13개 카테고리 샘플이 미리 들어있습니다).
+프리셋은 `scripts/presets.json`에 정의되어 있습니다. 결과 PDF는 `examples/` 디렉토리에 생성됩니다(레포에는 포함하지 않습니다 — 직접 실행해 생성).
 
 ---
 
